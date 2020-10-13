@@ -41,6 +41,8 @@ object Discover {
     path
   }
 
+  val m32 = "-m32"
+
   /** Find default clang compilation options. */
   def compileOptions(): Seq[String] = {
     val includes = {
@@ -49,7 +51,7 @@ object Discover {
           .getOrElse(Seq.empty)
       ("/usr/local/include" +: includedir).map(s => s"-I$s")
     }
-    includes :+ "-Qunused-arguments"
+    includes :+ "-Qunused-arguments" :+ m32
   }
 
   /** Find default options passed to the system's native linker. */
@@ -60,7 +62,7 @@ object Discover {
           .getOrElse(Seq.empty)
       ("/usr/local/lib" +: libdir).map(s => s"-L$s")
     }
-    libs
+    libs :+ m32
   }
 
   /** Detect the target architecture.
