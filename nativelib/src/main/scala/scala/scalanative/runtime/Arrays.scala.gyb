@@ -10,7 +10,7 @@
 //
 //   scripts/gyb.py \
 //     nativelib/src/main/scala/scala/scalanative/runtime/Arrays.scala.gyb \
-//     -o /nativelib/src/main/scala/scala/scalanative/runtime/Arrays.scala
+//     -o nativelib/src/main/scala/scala/scalanative/runtime/Arrays.scala
 //
 //  After executing the script, you may want to edit this file to remove
 //  personally or build-system specific identifiable information.
@@ -29,8 +29,8 @@ import scala.runtime.BoxedUnit
 import scalanative.unsafe._
 import scalanative.runtime.Intrinsics._
 
-% sizePtr = 8
-% sizeHeader = 16
+% sizePtr = 4
+% sizeHeader = sizePtr+8
 
 sealed abstract class Array[T]
     extends java.io.Serializable
@@ -227,8 +227,8 @@ object ${T}Array {
     val arrty   = toRawType(classOf[${T}Array])
     val arrsize = ${sizeHeader} + ${sizeT} * length
     val arr     = ${alloc}(arrty, arrsize)
-    storeInt(elemRawPtr(arr, 8), length)
-    storeInt(elemRawPtr(arr, 12), ${sizeT}.toInt)
+    storeInt(elemRawPtr(arr, ${sizePtr}), length)
+    storeInt(elemRawPtr(arr, ${sizePtr+4}), ${sizeT}.toInt)
     castRawPtrToObject(arr).asInstanceOf[${T}Array]
   }
 

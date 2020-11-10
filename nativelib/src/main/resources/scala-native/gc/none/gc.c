@@ -9,11 +9,12 @@
 // Dummy GC that maps chunks of 4GB and allocates but never frees.
 
 // Map 4GB
-#define CHUNK (4 * 1024 * 1024 * 1024L)
+// TODO: 32-bits addon. Doesn't overflow signed long (31 bits)
+#define CHUNK (1 * 1024 * 1024 * 1024L)
 // Allow read and write
 #define DUMMY_GC_PROT (PROT_READ | PROT_WRITE)
 // Map private anonymous memory, and prevent from reserving swap
-#define DUMMY_GC_FLAGS (MAP_NORESERVE | MAP_PRIVATE | MAP_ANONYMOUS)
+#define DUMMY_GC_FLAGS (MAP_NORESERVE | MAP_PRIVATE | MAP_ANONYMOUS | MAP_32BIT)
 // Map anonymous memory (not a file)
 #define DUMMY_GC_FD -1
 #define DUMMY_GC_FD_OFFSET 0
@@ -28,7 +29,7 @@ void scalanative_init() {
 }
 
 void *scalanative_alloc(void *info, size_t size) {
-    size = size + (8 - size % 8);
+    size = size + (8 - size % 8);   // TODO: Wasting memory if multiple of 8, no ?
     if (current + size < end) {
         void **alloc = current;
         *alloc = info;

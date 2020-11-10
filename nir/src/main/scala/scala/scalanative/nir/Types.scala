@@ -28,7 +28,7 @@ object Type {
   /** Primitive value types. */
   sealed abstract class PrimitiveKind(val width: Int) extends ValueKind
   final case object Bool                              extends PrimitiveKind(1)
-  final case object Ptr                               extends PrimitiveKind(64)
+  final case object Ptr                               extends PrimitiveKind(32)
 
   sealed abstract class I(width: Int, val signed: Boolean)
       extends PrimitiveKind(width)

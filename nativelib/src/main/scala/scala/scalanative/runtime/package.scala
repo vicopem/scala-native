@@ -9,11 +9,12 @@ import scalanative.runtime.LLVMIntrinsics._
 package object runtime {
 
   /** Runtime Type Information. */
-  type Type = CStruct2[Int, String]
+  type Type = CStruct3[Int, Int, String]
 
   implicit class TypeOps(val self: Ptr[Type]) extends AnyVal {
     @alwaysinline def id: Int          = self._1
-    @alwaysinline def name: String     = self._2
+    @alwaysinline def traitId: Int     = self._2
+    @alwaysinline def name: String     = self._3
     @alwaysinline def isClass: Boolean = id >= 0
   }
 
@@ -22,7 +23,8 @@ package object runtime {
 
   implicit class ClassTypeOps(val self: Ptr[ClassType]) extends AnyVal {
     @alwaysinline def id: Int            = self._1._1
-    @alwaysinline def name: String       = self._1._2
+    @alwaysinline def traitId: Int       = self._1._2
+    @alwaysinline def name: String       = self._1._3
     @alwaysinline def size: Int          = self._2
     @alwaysinline def idRangeUntil: Long = self._3
   }

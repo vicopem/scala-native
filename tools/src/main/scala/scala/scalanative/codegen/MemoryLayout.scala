@@ -34,7 +34,7 @@ object MemoryLayout {
     case Type.StructValue(tys) =>
       MemoryLayout(tys).size
     case Type.Nothing | Type.Ptr | _: Type.RefKind =>
-      8
+      4
     case _ =>
       unsupported(s"sizeof $ty")
   }
@@ -49,7 +49,7 @@ object MemoryLayout {
     case Type.StructValue(tys) =>
       tys.map(alignmentOf).max
     case Type.Nothing | Type.Ptr | _: Type.RefKind =>
-      8
+      4
     case _ =>
       unsupported(s"alignment $ty")
   }

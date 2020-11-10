@@ -5,6 +5,13 @@
 // All direct edits to this file will be lost the next time it
 // is generated.
 //
+// To generate this file manually execute the python scripts/gyb.py
+// script under the project root. For example, from the project root:
+//
+//   scripts/gyb.py \
+//     nativelib/src/main/scala/scala/scalanative/unsafe/Tag.scala.gyb \
+//     -o nativelib/src/main/scala/scala/scalanative/unsafe/Tag.scala
+//
 // See nativelib runtime/Arrays.scala.gyb for details.
 
 package scala.scalanative
@@ -24,11 +31,13 @@ sealed abstract class Tag[T] {
   @noinline def store(ptr: unsafe.Ptr[T], value: T): Unit = throwUndefined()
 }
 
+% sizePtr = 4
+
 object Tag {
   final case class Ptr[T](of: Tag[T])
       extends Tag[unsafe.Ptr[T]] {
-    @alwaysinline def size: Int = 8
-    @alwaysinline def alignment: Int = 8
+    @alwaysinline def size: Int = ${sizePtr}
+    @alwaysinline def alignment: Int = ${sizePtr}
     @alwaysinline override def load(ptr: unsafe.Ptr[unsafe.Ptr[T]]): unsafe.Ptr[T] =
       fromRawPtr[T](loadRawPtr(toRawPtr(ptr)))
     @alwaysinline override def store(ptr: unsafe.Ptr[unsafe.Ptr[T]], value: unsafe.Ptr[T]): Unit =
@@ -37,15 +46,15 @@ object Tag {
 
   final case class Class[T <: AnyRef](of: java.lang.Class[T])
       extends Tag[T] {
-    @alwaysinline def size: Int = 8
-    @alwaysinline def alignment: Int = 8
+    @alwaysinline def size: Int = ${sizePtr}
+    @alwaysinline def alignment: Int = ${sizePtr}
     @alwaysinline override def load(ptr: unsafe.Ptr[T]): T =
       loadObject(toRawPtr(ptr)).asInstanceOf[T]
     @alwaysinline override def store(ptr: unsafe.Ptr[T], value: T): Unit =
       storeObject(toRawPtr(ptr), value.asInstanceOf[Object])
   }
 
-  % prims = [('Unit', 'scala.Unit', 8),
+  % prims = [('Unit', 'scala.Unit', sizePtr),
   %          ('Boolean', 'scala.Boolean', 1),
   %          ('Char', 'scala.Char', 2),
   %          ('Byte', 'scala.Byte', 1),
@@ -202,8 +211,8 @@ object Tag {
   %   nativeCFuncPtr = "unsafe.CFuncPtr{}[{}]".format(N, targs)
 
   object CFuncPtr${N} extends Tag[${nativeCFuncPtr}] {
-    @alwaysinline def size: Int = 8
-    @alwaysinline def alignment: Int = 8
+    @alwaysinline def size: Int = ${sizePtr}
+    @alwaysinline def alignment: Int = ${sizePtr}
     @alwaysinline override def load(ptr: unsafe.Ptr[${nativeCFuncPtr}]): ${nativeCFuncPtr} =
       Boxes.boxToCFuncRawPtr(loadRawPtr(toRawPtr(ptr)))
     @alwaysinline override def store(ptr: unsafe.Ptr[${nativeCFuncPtr}], value: ${nativeCFuncPtr}): Unit =
