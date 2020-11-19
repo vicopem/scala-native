@@ -8,7 +8,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.Assert._
 
-@Ignore
+@Ignore("tests disabled but ignore on class doesn't work")
 class AtomicReferenceTest {
 
   // This test suite is INCOMPLETE (obviously!).
@@ -21,6 +21,7 @@ class AtomicReferenceTest {
   // how to test concurrent and contended access patterns within
   // the scope of unit-tests.
 
+  @Ignore
   @Test def get(): Unit = {
 
     val expected = -1
@@ -32,6 +33,7 @@ class AtomicReferenceTest {
                result == expected)
   }
 
+  @Ignore
   @Test def getAndUpdateUpdateFunction(): Unit = {
 
     val expectedValue    = 100
@@ -56,6 +58,7 @@ class AtomicReferenceTest {
                newValue == expectedNewValue)
   }
 
+  @Ignore
   @Test def updateAndGetUpdateFunction(): Unit = {
 
     val initialValue = 100
