@@ -1,6 +1,6 @@
-package scala.scalanative.junit.utils
+package java.util.regex
 
-import AssertThrows._
+import scala.scalanative.junit.utils.AssertThrows._
 
 object ThrowsHelper {
   def assertThrowsAnd[T <: Throwable, U](

@@ -1,35 +1,29 @@
 package java.net
 
 // Ported from Apache Harmony
+object Inet6AddressSuite extends tests.Suite {
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class Inet6AddressTest {
-
-  @Test def isMulticastAddress(): Unit = {
+  test("isMulticastAddress") {
     val addr = InetAddress.getByName("FFFF::42:42")
-    assertTrue(addr.isMulticastAddress())
+    assert(addr.isMulticastAddress())
 
     val addr2 = InetAddress.getByName("42::42:42")
-    assertFalse(addr2.isMulticastAddress())
+    assertNot(addr2.isMulticastAddress())
 
     val addr3 = InetAddress.getByName("::224.42.42.42")
-    assertFalse(addr3.isMulticastAddress())
+    assertNot(addr3.isMulticastAddress())
 
     val addr4 = InetAddress.getByName("::42.42.42.42")
-    assertFalse(addr4.isMulticastAddress())
+    assertNot(addr4.isMulticastAddress())
 
     val addr5 = InetAddress.getByName("::FFFF:224.42.42.42")
     assert(addr5.isMulticastAddress())
 
     val addr6 = InetAddress.getByName("::FFFF:42.42.42.42")
-    assertFalse(addr6.isMulticastAddress())
+    assertNot(addr6.isMulticastAddress())
   }
 
-  @Test def isAnyLocalAddress(): Unit = {
+  test("isAnyLocalAddress") {
     val addr = InetAddress.getByName("::0")
     assert(addr.isAnyLocalAddress)
 
@@ -37,21 +31,21 @@ class Inet6AddressTest {
     assert(addr2.isAnyLocalAddress)
 
     val addr3 = InetAddress.getByName("::1")
-    assertFalse(addr3.isAnyLocalAddress)
+    assertNot(addr3.isAnyLocalAddress)
   }
 
-  @Test def isLoopbackAddress(): Unit = {
+  test("isLoopbackAddress") {
     val addr = InetAddress.getByName("::1")
     assert(addr.isLoopbackAddress)
 
     val addr2 = InetAddress.getByName("::2")
-    assertFalse(addr2.isLoopbackAddress)
+    assertNot(addr2.isLoopbackAddress)
 
     val addr3 = InetAddress.getByName("::FFFF:127.0.0.0")
     assert(addr3.isLoopbackAddress)
   }
 
-  @Test def isLinkLocalAddress(): Unit = {
+  test("isLinkLocalAddress") {
     val addr = InetAddress.getByName("FE80::0")
     assert(addr.isLinkLocalAddress)
 
@@ -59,29 +53,31 @@ class Inet6AddressTest {
     assert(addr2.isLinkLocalAddress)
 
     val addr3 = InetAddress.getByName("FEC0::1")
-    assertFalse(addr3.isLinkLocalAddress)
+    assertNot(addr3.isLinkLocalAddress)
   }
 
-  @Test def isSiteLocalAddress(): Unit = {
+  test("isSiteLocalAddress") {
     val addr = InetAddress.getByName("FEC0::0")
     assert(addr.isSiteLocalAddress)
 
     val addr2 = InetAddress.getByName("FEBF::FFFF:FFFF:FFFF:FFFF:FFFF")
-    assertFalse(addr2.isSiteLocalAddress)
+    assertNot(addr2.isSiteLocalAddress)
   }
 
-  @Test def isIPv4CompatibleAddress(): Unit = {
+  test("isIPv4CompatibleAddress") {
     val addr2 =
       InetAddress.getByName("::255.255.255.255").asInstanceOf[Inet6Address]
     assert(addr2.isIPv4CompatibleAddress)
   }
 
-  @Test def getByAddress(): Unit = {
-    assertThrows(classOf[UnknownHostException],
-                 Inet6Address.getByAddress("123", null, 0))
+  test("getByAddress") {
+    assertThrows[UnknownHostException] {
+      Inet6Address.getByAddress("123", null, 0)
+    }
     val addr1 = Array[Byte](127.toByte, 0.toByte, 0.toByte, 1.toByte)
-    assertThrows(classOf[UnknownHostException],
-                 Inet6Address.getByAddress("123", addr1, 0))
+    assertThrows[UnknownHostException] {
+      Inet6Address.getByAddress("123", addr1, 0)
+    }
 
     val addr2 = Array[Byte](
       0xFE.toByte,
