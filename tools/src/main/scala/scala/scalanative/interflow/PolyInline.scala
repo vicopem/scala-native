@@ -54,8 +54,7 @@ trait PolyInline { self: Interflow =>
   }
 
   def polyInline(op: Op.Method, args: Seq[Val])(implicit state: State,
-                                                linked: linker.Result,
-                                                origPos: Position): Val = {
+                                                linked: linker.Result): Val = {
     import state.{emit, fresh, materialize}
 
     val obj     = materialize(op.obj)

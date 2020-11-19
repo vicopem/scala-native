@@ -95,21 +95,20 @@ trait NirGenStat { self: NirGenPhase =>
       val fields = genStructFields(sym)
       val body   = cd.impl.body
 
-      buf += Defn.Class(attrs, name, None, Seq.empty)(cd.pos)
+      buf += Defn.Class(attrs, name, None, Seq.empty)
       genMethods(cd)
     }
 
     def genStructAttrs(sym: Symbol): Attrs = Attrs.None
 
     def genFuncRawPtrExternForwarder(cd: ClassDef): Defn = {
-      val attrs                      = Attrs(isExtern = true)
-      val name                       = genFuncPtrExternForwarderName(cd.symbol)
-      val sig                        = Type.Function(Seq.empty, Type.Unit)
-      implicit val pos: nir.Position = cd.pos
+      val attrs = Attrs(isExtern = true)
+      val name  = genFuncPtrExternForwarderName(cd.symbol)
+      val sig   = Type.Function(Seq.empty, Type.Unit)
       val body =
         Seq(Inst.Label(Local(0), Seq.empty), Inst.Unreachable(Next.None))
 
-      Defn.Define(attrs, name, sig, body)(cd.pos)
+      Defn.Define(attrs, name, sig, body)
     }
 
     def genFuncPtrExternForwarder(cd: ClassDef): Defn = {
@@ -134,8 +133,6 @@ trait NirGenStat { self: NirGenPhase =>
       val name  = genFuncPtrExternForwarderName(cd.symbol)
       val sig   = genExternMethodSig(applySym)
 
-      implicit val pos: nir.Position = applySym.pos
-
       val body = scoped(
         curUnwindHandler := None
       ) {
@@ -159,7 +156,7 @@ trait NirGenStat { self: NirGenPhase =>
         buf.toSeq
       }
 
-      Defn.Define(attrs, name, sig, body)(cd.pos)
+      Defn.Define(attrs, name, sig, body)
     }
 
     def genNormalClass(cd: ClassDef): Unit = {
@@ -169,7 +166,6 @@ trait NirGenStat { self: NirGenPhase =>
       def parent = genClassParent(sym)
       def traits = genClassInterfaces(sym)
 
-      implicit val pos: nir.Position = cd.pos
       genReflectiveInstantiation(cd)
       genClassFields(sym)
       genMethods(cd)
@@ -226,7 +222,7 @@ trait NirGenStat { self: NirGenPhase =>
         genTypeName(psym)
       }
 
-    def genClassFields(sym: Symbol)(implicit pos: nir.Position): Unit = {
+    def genClassFields(sym: Symbol): Unit = {
       val attrs = nir.Attrs(isExtern = sym.isExternModule)
 
       for (f <- sym.info.decls
@@ -285,7 +281,7 @@ trait NirGenStat { self: NirGenPhase =>
           buf += Defn.Define(Attrs(),
                              name,
                              nir.Type.Function(Seq.empty[nir.Type], Type.Unit),
-                             body)(cd.pos)
+                             body)
         case _ => ()
       }
     }
@@ -294,7 +290,7 @@ trait NirGenStat { self: NirGenPhase =>
     // which is expected to extend one of scala.runtime.AbstractFunctionX.
     private def genReflectiveInstantiationConstructor(
         reflInstBuffer: ReflectiveInstantiationBuffer,
-        superClass: Global)(implicit pos: nir.Position): Unit = {
+        superClass: Global): Unit = {
       withFreshExprBuffer { exprBuf =>
         val body = {
           // first argument is this
@@ -323,12 +319,10 @@ trait NirGenStat { self: NirGenPhase =>
     }
 
     // Allocate and construct an object, using the provided ExprBuffer.
-    private def allocAndConstruct(
-        exprBuf: ExprBuffer,
-        name: Global,
-        argTypes: Seq[nir.Type],
-        args: Seq[Val])(implicit pos: nir.Position): Val = {
-
+    private def allocAndConstruct(exprBuf: ExprBuffer,
+                                  name: Global,
+                                  argTypes: Seq[nir.Type],
+                                  args: Seq[Val]): Val = {
       val alloc = exprBuf.classalloc(name, unwind(curFresh))
       exprBuf.call(
         Type.Function(Type.Ref(name) +: argTypes, Type.Unit),
@@ -345,8 +339,6 @@ trait NirGenStat { self: NirGenPhase =>
 
       val fqSymId   = curClassSym.fullName + "$"
       val fqSymName = Global.Top(fqSymId)
-
-      implicit val pos: nir.Position = cd.pos
 
       reflectiveInstantiationInfo += ReflectiveInstantiationBuffer(fqSymId)
       val reflInstBuffer = reflectiveInstantiationInfo.last
@@ -415,17 +407,15 @@ trait NirGenStat { self: NirGenPhase =>
       val fqSymName = Global.Top(fqSymId)
 
       // Create a new Tuple2 and initialise it with the provided values.
-      def createTuple2(exprBuf: ExprBuffer, _1: Val, _2: Val)(
-          implicit pos: nir.Position): Val = {
+      def createTuple2(exprBuf: ExprBuffer, _1: Val, _2: Val): Val = {
         allocAndConstruct(exprBuf,
                           tuple2,
                           Seq(jlObjectRef, jlObjectRef),
                           Seq(_1, _2))
       }
 
-      def genClassConstructorsInfo(
-          exprBuf: ExprBuffer,
-          ctors: Seq[global.Symbol])(implicit pos: nir.Position): Val = {
+      def genClassConstructorsInfo(exprBuf: ExprBuffer,
+                                   ctors: Seq[global.Symbol]): Val = {
         val applyMethodSig =
           Sig.Method("apply", Seq(jlObjectRef, jlObjectRef))
 
@@ -440,9 +430,8 @@ trait NirGenStat { self: NirGenPhase =>
         // For each (public) constructor C, generate a lambda responsible for
         // initialising and returning an instance of the class, using C.
         for ((ctor, ctorIdx) <- ctors.zipWithIndex) {
-          val ctorSig                    = genMethodSig(ctor)
-          val ctorArgsSig                = ctorSig.args.map(_.mangle).mkString
-          implicit val pos: nir.Position = ctor.pos
+          val ctorSig     = genMethodSig(ctor)
+          val ctorArgsSig = ctorSig.args.map(_.mangle).mkString
 
           reflectiveInstantiationInfo += ReflectiveInstantiationBuffer(
             fqSymId + ctorArgsSig)
@@ -555,7 +544,6 @@ trait NirGenStat { self: NirGenPhase =>
             .alternatives
             .filter(_.isPublic)
 
-      implicit val pos: nir.Position = cd.pos
       if (ctors.isEmpty)
         Seq.empty
       else
@@ -590,8 +578,6 @@ trait NirGenStat { self: NirGenPhase =>
     def genMethod(dd: DefDef): Unit = {
       val fresh = Fresh()
       val env   = new MethodEnv(fresh)
-
-      implicit val pos: nir.Position = dd.pos
 
       scoped(
         curMethodSym := dd.symbol,
@@ -642,7 +628,7 @@ trait NirGenStat { self: NirGenPhase =>
           val moduleName  = genTypeName(curClassSym)
           val externAttrs = Attrs(isExtern = true)
           val externSig   = genExternMethodSig(curMethodSym)
-          val externDefn  = Defn.Declare(externAttrs, name, externSig)(rhs.pos)
+          val externDefn  = Defn.Declare(externAttrs, name, externSig)
 
           buf += externDefn
 
@@ -703,8 +689,6 @@ trait NirGenStat { self: NirGenPhase =>
       val fresh = curFresh.get
       val buf   = new ExprBuffer()(fresh)
 
-      implicit val pos: nir.Position = dd.pos
-
       val paramSyms = genParamSyms(dd, isStatic)
       val params = paramSyms.map {
         case None =>
@@ -749,7 +733,7 @@ trait NirGenStat { self: NirGenPhase =>
           val local  = curMethodEnv.enterLabel(label)
           val values = params.take(label.params.length)
 
-          buf.jump(local, values)(label.pos)
+          buf.jump(local, values)
           scoped(
             curMethodThis := {
               if (isStatic) None
@@ -757,15 +741,14 @@ trait NirGenStat { self: NirGenPhase =>
             },
             curMethodIsExtern := isExtern
           ) {
-            buf.genReturn(buf.genTailRecLabel(dd, isStatic, label))(
-              bodyp.pos.focusEnd)
+            buf.genReturn(buf.genTailRecLabel(dd, isStatic, label))
           }
 
         case _ if curMethodSym.get == NObjectInitMethod =>
           scoped(
             curMethodIsExtern := isExtern
           ) {
-            buf.genReturn(nir.Val.Unit)(bodyp.pos.focusEnd)
+            buf.genReturn(nir.Val.Unit)
           }
 
         case _ =>
@@ -776,7 +759,7 @@ trait NirGenStat { self: NirGenPhase =>
             },
             curMethodIsExtern := isExtern
           ) {
-            buf.genReturn(buf.genExpr(bodyp))(bodyp.pos.focusEnd)
+            buf.genReturn(buf.genExpr(bodyp))
           }
       }
 

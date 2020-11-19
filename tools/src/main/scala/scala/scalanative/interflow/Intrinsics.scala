@@ -32,8 +32,7 @@ trait Intrinsics { self: Interflow =>
   ) ++ arrayIntrinsics
 
   def intrinsic(ty: Type, name: Global, rawArgs: Seq[Val])(
-      implicit state: State,
-      origPos: Position): Option[Val] = {
+      implicit state: State): Option[Val] = {
     val Global.Member(_, sig) = name
 
     val args = rawArgs.map(eval)
@@ -79,7 +78,7 @@ trait Intrinsics { self: Interflow =>
       case Rt.GetNameSig =>
         args match {
           case Seq(VirtualRef(_, _, Array(Val.Global(name: Global.Top, _)))) =>
-            Some(eval(Val.String(name.id)))
+            Some(eval(Val.String(name.id))(state))
           case _ =>
             None
         }

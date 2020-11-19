@@ -13,7 +13,6 @@ object GenerateReflectiveProxies {
   private def genReflProxy(defn: Defn.Define): Defn.Define = {
     val Global.Member(owner, sig) = defn.name
     val defnType                  = defn.ty.asInstanceOf[Type.Function]
-    implicit val pos: Position    = defn.pos
 
     val proxyArgs = genProxyArgs(defnType)
     val proxyTy   = genProxyTy(defnType, proxyArgs)
@@ -46,28 +45,25 @@ object GenerateReflectiveProxies {
       case _         => Type.Ref(Global.Top("java.lang.Object"))
     })
 
-  private def genProxyLabel(args: Seq[Type])(implicit pos: nir.Position) = {
+  private def genProxyLabel(args: Seq[Type]) = {
     val argLabels = Val.Local(fresh(), args.head) ::
       args.tail.map(argty => Val.Local(fresh(), argty)).toList
 
     Inst.Label(fresh(), argLabels)
   }
 
-  private def genArgUnboxes(label: Inst.Label) = {
-    import label.pos
+  private def genArgUnboxes(label: Inst.Label) =
     label.params.tail.map {
       case local: Val.Local if Type.unbox.contains(local.ty) =>
         Inst.Let(Op.Unbox(local.ty, local), Next.None)
       case local: Val.Local =>
         Inst.Let(Op.Copy(local), Next.None)
     }
-  }
 
   private def genCall(defnTy: Type.Function,
                       method: Inst.Let,
                       params: Seq[Val.Local],
                       unboxes: Seq[Inst.Let]) = {
-    import method.pos
     val callParams =
       params.head ::
         unboxes
@@ -82,8 +78,7 @@ object GenerateReflectiveProxies {
              Next.None)
   }
 
-  private def genRetValBox(callName: Local, defnRetTy: Type, proxyRetTy: Type)(
-      implicit pos: nir.Position) =
+  private def genRetValBox(callName: Local, defnRetTy: Type, proxyRetTy: Type) =
     Type.box.get(defnRetTy) match {
       case Some(boxTy) =>
         Inst.Let(Op.Box(boxTy, Val.Local(callName, defnRetTy)), Next.None)
@@ -91,8 +86,7 @@ object GenerateReflectiveProxies {
         Inst.Let(Op.Copy(Val.Local(callName, defnRetTy)), Next.None)
     }
 
-  private def genRet(retValBoxName: Local, proxyRetTy: Type)(
-      implicit pos: nir.Position) =
+  private def genRet(retValBoxName: Local, proxyRetTy: Type) =
     proxyRetTy match {
       case Type.Unit => Inst.Ret(Val.Unit)
       case _         => Inst.Ret(Val.Local(retValBoxName, proxyRetTy))
