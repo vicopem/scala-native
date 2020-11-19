@@ -2,12 +2,7 @@ package java.net
 
 // Ported from Scala.js and Apache Harmony
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class URITest {
+object URISuite extends tests.Suite {
 
   def expectURI(uri: URI, isAbsolute: Boolean, isOpaque: Boolean)(
       authority: String = null,
@@ -45,7 +40,7 @@ class URITest {
     assertEquals(isOpaque, uri.isOpaque())
   }
 
-  @Test def shouldParseVanillaAbsoluteURIs(): Unit = {
+  test("should parse vanilla absolute URIs") {
     expectURI(new URI("http://java.sun.com/j2se/1.3/"), true, false)(
       scheme = "http",
       host = "java.sun.com",
@@ -54,7 +49,7 @@ class URITest {
       schemeSpecificPart = "//java.sun.com/j2se/1.3/")()
   }
 
-  @Test def shouldParseAbsoluteURIsWithEmptyPath(): Unit = {
+  test("should parse absolute URIs with empty path") {
     expectURI(new URI("http://foo:bar"), true, false)(authority = "foo:bar",
                                                       path = "",
                                                       scheme = "http",
@@ -62,7 +57,7 @@ class URITest {
                                                         "//foo:bar")()
   }
 
-  @Test def shouldParseAbsoluteURIsWithIPv6(): Unit = {
+  test("should parse absolute URIs with IPv6") {
     val uri = new URI("http://hans@[ffff::0:128.4.5.3]:345/~hans/")
     expectURI(uri, true, false)(
       scheme = "http",
@@ -75,21 +70,21 @@ class URITest {
     )()
   }
 
-  @Test def shouldParseAbsoluteURIsWithoutAuthority(): Unit = {
+  test("should parse absolute URIs without authority") {
     expectURI(new URI("file:/~/calendar"), true, false)(scheme = "file",
                                                         path = "/~/calendar",
                                                         schemeSpecificPart =
                                                           "/~/calendar")()
   }
 
-  @Test def shouldParseAbsoluteURIswithEmptyAuthority(): Unit = {
+  test("should parse absolute URIs with empty authority") {
     expectURI(new URI("file:///~/calendar"), true, false)(scheme = "file",
                                                           path = "/~/calendar",
                                                           schemeSpecificPart =
                                                             "///~/calendar")()
   }
 
-  @Test def shouldParseOpaqueURIs(): Unit = {
+  test("should parse opaque URIs") {
     expectURI(new URI("mailto:java-net@java.sun.com"), true, true)(
       scheme = "mailto",
       schemeSpecificPart = "java-net@java.sun.com")()
@@ -103,7 +98,7 @@ class URITest {
                                                             "isbn:096139210x")()
   }
 
-  @Test def shouldParseRelativeURIs(): Unit = {
+  test("should parse relative URIs") {
     expectURI(new URI("docs/guide/collections/designfaq.html#28"),
               false,
               false)(path = "docs/guide/collections/designfaq.html",
@@ -117,7 +112,7 @@ class URITest {
                        "../../../demo/jfc/SwingSet2/src/SwingSet2.java")()
   }
 
-  @Test def shouldFailOnBadURIs(): Unit = {
+  test("should fail on bad URIs") {
     val badURIs = Array(
       "http:///a path#frag", // space char in path, not in escaped
       // octet form, with no host
@@ -167,11 +162,11 @@ class URITest {
     )
 
     for (uri <- badURIs) {
-      assertThrows(classOf[URISyntaxException], new URI(uri))
+      assertThrows[URISyntaxException] { new URI(uri) }
     }
   }
 
-  @Test def constructorShouldNotThrowOnGoodURIs(): Unit = {
+  test("constructor should not throw on good URIs") {
     val uris = Array(
       "http://user@www.google.com:45/search?q=helpinfo#somefragment",
       // http with authority, query and fragment

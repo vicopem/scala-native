@@ -1,13 +1,8 @@
 package java.net
 
-import org.junit.Test
-import org.junit.Assert._
+object SocketSuite extends tests.Suite {
 
-import scalanative.junit.utils.AssertThrows._
-
-class SocketTest {
-
-  @Test def keepAlive(): Unit = {
+  test("keepAlive") {
     val s = new Socket()
     try {
       val prevValue = s.getKeepAlive
@@ -18,7 +13,7 @@ class SocketTest {
     }
   }
 
-  @Test def reuseAddr(): Unit = {
+  test("reuseAddr") {
     val s = new Socket()
     try {
       val prevValue = s.getReuseAddress
@@ -29,7 +24,7 @@ class SocketTest {
     }
   }
 
-  @Test def oobInline(): Unit = {
+  test("OOBInline") {
     val s = new Socket()
     try {
       val prevValue = s.getOOBInline
@@ -40,7 +35,7 @@ class SocketTest {
     }
   }
 
-  @Test def tcpNoDelay(): Unit = {
+  test("tcpNoDelay") {
     val s = new Socket()
     try {
       val prevValue = s.getTcpNoDelay
@@ -51,7 +46,7 @@ class SocketTest {
     }
   }
 
-  @Test def soLinger(): Unit = {
+  test("soLinger") {
     val s = new Socket()
     try {
       s.setSoLinger(true, 100)
@@ -63,7 +58,7 @@ class SocketTest {
     }
   }
 
-  @Test def soTimeout(): Unit = {
+  test("soTimeout") {
     val s = new Socket()
     try {
       val prevValue = s.getSoTimeout
@@ -74,7 +69,7 @@ class SocketTest {
     }
   }
 
-  @Test def receiveBufferSize(): Unit = {
+  test("receiveBufferSize") {
     // This test basically checks that getReceiveBufferSize &
     // setReceiveBufferSize do not unexpectedly throw and that the former
     // returns a minimally sane value.
@@ -102,14 +97,14 @@ class SocketTest {
 
     try {
       val prevValue = s.getReceiveBufferSize
-      assertTrue(prevValue > 0)
+      assert(prevValue > 0)
       s.setReceiveBufferSize(prevValue + 100)
     } finally {
       s.close()
     }
   }
 
-  @Test def sendBufferSize(): Unit = {
+  test("sendBufferSize") {
     // This test basically checks that getSendBufferSize &
     // setSendBufferSize do not unexpectedly throw and that the former
     // returns a minimally sane value.
@@ -119,14 +114,14 @@ class SocketTest {
 
     try {
       val prevValue = s.getSendBufferSize
-      assertTrue(prevValue > 0)
+      assert(prevValue > 0)
       s.setSendBufferSize(prevValue + 100)
     } finally {
       s.close()
     }
   }
 
-  @Test def trafficClass(): Unit = {
+  test("trafficClass") {
     val s = new Socket()
     try {
       s.setTrafficClass(0x28)
@@ -136,23 +131,23 @@ class SocketTest {
     }
   }
 
-  @Test def connectWithTimeout(): Unit = {
+  test("connect with timeout") {
     val s = new Socket()
     try {
-      assertThrows(
-        classOf[SocketTimeoutException],
-        s.connect(new InetSocketAddress("123.123.123.123", 12341), 100))
+      assertThrows[SocketTimeoutException] {
+        s.connect(new InetSocketAddress("123.123.123.123", 12341), 100)
+      }
     } finally {
       s.close()
     }
   }
 
-  @Test def bind(): Unit = {
+  test("bind") {
     val s1 = new Socket
     try {
       val nonLocalAddr =
         new InetSocketAddress(InetAddress.getByName("123.123.123.123"), 0)
-      assertThrows(classOf[BindException], s1.bind(nonLocalAddr))
+      assertThrows[BindException] { s1.bind(nonLocalAddr) }
     } finally {
       s1.close()
     }
@@ -170,7 +165,7 @@ class SocketTest {
     val s3 = new Socket
     try {
       s3.bind(null)
-      assertTrue(s3.getLocalSocketAddress != null)
+      assert(s3.getLocalSocketAddress != null)
     } finally {
       s3.close()
     }
@@ -180,7 +175,7 @@ class SocketTest {
       s4.bind(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
       val s5 = new Socket
       try {
-        assertThrows(classOf[BindException], s5.bind(s4.getLocalSocketAddress))
+        assertThrows[BindException] { s5.bind(s4.getLocalSocketAddress) }
       } finally {
         s5.close()
       }
@@ -191,8 +186,9 @@ class SocketTest {
     class UnsupportedSocketAddress extends SocketAddress
     val s6 = new Socket
     try {
-      assertThrows(classOf[IllegalArgumentException],
-                   s6.bind(new UnsupportedSocketAddress))
+      assertThrows[IllegalArgumentException] {
+        s6.bind(new UnsupportedSocketAddress)
+      }
     } finally {
       s6.close()
     }

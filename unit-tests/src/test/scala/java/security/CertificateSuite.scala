@@ -1,14 +1,12 @@
 package java.security
 
-// Note: Partially implemented
-// Ported from Harmony
-
 import java.security.cert.{CertificateEncodingException, CertificateException}
 
-import org.junit.Test
-import org.junit.Assert._
+// Note: Partially implemented
 
-class CertificateTest {
+// Ported from Harmony
+
+object CertificateSuite extends tests.Suite {
 
   /**
    * Meaningless cert encoding just for testing purposes
@@ -16,12 +14,12 @@ class CertificateTest {
   private val testEncoding =
     Array[Byte](1.toByte, 2.toByte, 3.toByte, 4.toByte, 5.toByte)
 
-  @Test def getType(): Unit = {
+  test("getType") {
     val c1 = new MyCertificate("TEST_TYPE", testEncoding)
     assertEquals("TEST_TYPE", c1.getType)
   }
 
-  @Test def equals(): Unit = {
+  test("equals") {
 
     val c1 = new MyCertificate("TEST_TYPE", testEncoding)
     val c2 = new MyCertificate("TEST_TYPE", testEncoding)

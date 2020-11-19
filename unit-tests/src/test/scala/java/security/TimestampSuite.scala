@@ -4,15 +4,10 @@ package java.security
 
 import java.util.Date
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
 /**
  * Tests for [[Timestamp]] class fields and methods
  */
-class TimestampTest {
+object TimestampSuite extends tests.Suite {
 
   private[this] val now: Date = new Date()
 
@@ -45,38 +40,37 @@ class TimestampTest {
     override def getEncodings: java.util.Iterator[String] = null
   }
 
-  @Test def constructor(): Unit = {
+  test("constructor") {
     // Check that nulls are not accepted.
-    assertThrows(classOf[NullPointerException],
-                 new Timestamp(null, MockCertPath))
-    assertThrows(classOf[NullPointerException], new Timestamp(now, null))
+    assertThrows[NullPointerException](new Timestamp(null, MockCertPath))
+    assertThrows[NullPointerException](new Timestamp(now, null))
   }
 
-  @Test def testEquals(): Unit = {
+  test("equals") {
     val one = new Timestamp(now, MockCertPath)
     val two = new Timestamp(now, MockCertPath)
 
-    assertTrue(one.equals(one))
-    assertTrue(one.equals(two))
-    assertTrue(two.equals(one))
-    assertTrue(one != null)
-    assertFalse(one.equals(new Object()))
+    assert(one.equals(one))
+    assert(one.equals(two))
+    assert(two.equals(one))
+    assert(one != null)
+    assertNot(one.equals(new Object()))
 
     val two1 = new Timestamp(new Date(9999), MockCertPath)
-    assertFalse(one.equals(two1))
-    assertTrue(two1.equals(two1))
+    assertNot(one.equals(two1))
+    assert(two1.equals(two1))
   }
 
-  @Test def getSignerCertPath(): Unit = {
+  test("getSignerCertPath") {
     val t = new Timestamp(now, MockCertPath)
     assertEquals(t.getSignerCertPath, MockCertPath)
   }
 
-  @Test def getTimestamp(): Unit = {
+  test("getTimestamp") {
     assertEquals(now, new Timestamp(now, MockCertPath).getTimestamp)
   }
 
-  @Test def testToString(): Unit = {
+  test("toString") {
     new Timestamp(now, MockCertPath).toString
   }
 }
