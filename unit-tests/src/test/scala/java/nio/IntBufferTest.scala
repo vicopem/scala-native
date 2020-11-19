@@ -1,9 +1,8 @@
 package java.nio
 
-// Ported from Scala.js
-
 import java.nio.ByteBufferFactories._
 
+// Ported from Scala.js
 abstract class IntBufferTest extends BaseBufferTest {
   type Factory = BufferFactory.IntBufferFactory
 
@@ -35,20 +34,20 @@ abstract class IntBufferTest extends BaseBufferTest {
 
 }
 
-class AllocIntBufferTest extends IntBufferTest {
+object AllocIntBufferTest extends IntBufferTest {
   val factory: Factory = new AllocIntBufferFactory
 }
 
-class WrappedIntBufferTest extends IntBufferTest {
+object WrappedIntBufferTest extends IntBufferTest {
   val factory: Factory = new WrappedIntBufferFactory
 }
 
-class WrappedIntReadOnlyBufferTest extends IntBufferTest {
+object WrappedIntReadOnlyBufferTest extends IntBufferTest {
   val factory: Factory =
     new WrappedIntBufferFactory with BufferFactory.ReadOnlyBufferFactory
 }
 
-class AllocIntSlicedBufferTest extends IntBufferTest {
+object AllocIntSlicedBufferTest extends IntBufferTest {
   val factory: Factory =
     new AllocIntBufferFactory with BufferFactory.SlicedBufferFactory
 }
@@ -62,27 +61,27 @@ abstract class IntViewOfByteBufferTest(
     new ByteBufferIntViewFactory(byteBufferFactory, order)
 }
 
-class IntViewOfAllocByteBufferBigEndianTest
+object IntViewOfAllocByteBufferBigEndianTest
     extends IntViewOfByteBufferTest(new AllocByteBufferFactory,
                                     ByteOrder.BIG_ENDIAN)
 
-class IntViewOfWrappedByteBufferBigEndianTest
+object IntViewOfWrappedByteBufferBigEndianTest
     extends IntViewOfByteBufferTest(new WrappedByteBufferFactory,
                                     ByteOrder.BIG_ENDIAN)
 
-class IntViewOfSlicedAllocByteBufferBigEndianTest
+object IntViewOfSlicedAllocByteBufferBigEndianTest
     extends IntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
                                     ByteOrder.BIG_ENDIAN)
 
-class IntViewOfAllocByteBufferLittleEndianTest
+object IntViewOfAllocByteBufferLittleEndianTest
     extends IntViewOfByteBufferTest(new AllocByteBufferFactory,
                                     ByteOrder.LITTLE_ENDIAN)
 
-class IntViewOfWrappedByteBufferLittleEndianTest
+object IntViewOfWrappedByteBufferLittleEndianTest
     extends IntViewOfByteBufferTest(new WrappedByteBufferFactory,
                                     ByteOrder.LITTLE_ENDIAN)
 
-class IntViewOfSlicedAllocByteBufferLittleEndianTest
+object IntViewOfSlicedAllocByteBufferLittleEndianTest
     extends IntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
                                     ByteOrder.LITTLE_ENDIAN)
 
@@ -99,26 +98,26 @@ abstract class ReadOnlyIntViewOfByteBufferTest(
   }
 }
 
-class ReadOnlyIntViewOfAllocByteBufferBigEndianTest
+object ReadOnlyIntViewOfAllocByteBufferBigEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new AllocByteBufferFactory,
                                             ByteOrder.BIG_ENDIAN)
 
-class ReadOnlyIntViewOfWrappedByteBufferBigEndianTest
+object ReadOnlyIntViewOfWrappedByteBufferBigEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new WrappedByteBufferFactory,
                                             ByteOrder.BIG_ENDIAN)
 
-class ReadOnlyIntViewOfSlicedAllocByteBufferBigEndianTest
+object ReadOnlyIntViewOfSlicedAllocByteBufferBigEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
                                             ByteOrder.BIG_ENDIAN)
 
-class ReadOnlyIntViewOfAllocByteBufferFactoryEndianTest
+object ReadOnlyIntViewOfAllocByteBufferFactoryEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new AllocByteBufferFactory,
                                             ByteOrder.LITTLE_ENDIAN)
 
-class ReadOnlyIntViewOfWrappedByteBufferLittleEndianTest
+object ReadOnlyIntViewOfWrappedByteBufferLittleEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new WrappedByteBufferFactory,
                                             ByteOrder.LITTLE_ENDIAN)
 
-class ReadOnlyIntViewOfSlicedAllocByteBufferLittleEndianTest
+object ReadOnlyIntViewOfSlicedAllocByteBufferLittleEndianTest
     extends ReadOnlyIntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
                                             ByteOrder.LITTLE_ENDIAN)

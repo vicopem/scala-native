@@ -4,18 +4,13 @@ import java.nio.ByteBuffer
 import java.nio.file.{Files, Path, StandardOpenOption}
 import java.io.File
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class FileChannelTest {
-  @Test def fileChannelCanReadBufferFromFile(): Unit = {
+object FileChannelSuite extends tests.Suite {
+  test("A FileChannel can read a Buffer from a file") {
     withTemporaryDirectory { dir =>
       val f     = dir.resolve("f")
       val bytes = Array.apply[Byte](1, 2, 3, 4, 5)
       Files.write(f, bytes)
-      assertTrue(Files.getAttribute(f, "size") == 5)
+      assert(Files.getAttribute(f, "size") == 5)
 
       val channel = FileChannel.open(f)
       val buffer  = ByteBuffer.allocate(5)
@@ -23,21 +18,21 @@ class FileChannelTest {
       val bread = channel.read(buffer)
       buffer.flip()
 
-      assertTrue(buffer.limit() == 5)
-      assertTrue(buffer.position() == 0)
-      assertTrue(bread == 5l)
-      assertTrue(buffer.array() sameElements bytes)
+      assert(buffer.limit() == 5)
+      assert(buffer.position() == 0)
+      assert(bread == 5l)
+      assert(buffer.array() sameElements bytes)
 
       channel.close()
     }
   }
 
-  @Test def fileChannelCanReadBuffersFromFile(): Unit = {
+  test("A FileChannel can read Buffers from a file") {
     withTemporaryDirectory { dir =>
       val f     = dir.resolve("f")
       val bytes = Array.apply[Byte](1, 2, 3, 4, 5)
       Files.write(f, bytes)
-      assertTrue(Files.getAttribute(f, "size") == 5)
+      assert(Files.getAttribute(f, "size") == 5)
 
       val channel = FileChannel.open(f)
       val bufferA = ByteBuffer.allocate(2)
@@ -48,20 +43,20 @@ class FileChannelTest {
       bufferA.flip()
       bufferB.flip()
 
-      assertTrue(bufferA.limit() == 2)
-      assertTrue(bufferB.limit() == 3)
-      assertTrue(bufferA.position() == 0)
-      assertTrue(bufferB.position() == 0)
+      assert(bufferA.limit() == 2)
+      assert(bufferB.limit() == 3)
+      assert(bufferA.position() == 0)
+      assert(bufferB.position() == 0)
 
-      assertTrue(bread == 5l)
-      assertTrue(bufferA.array() sameElements Array[Byte](1, 2))
-      assertTrue(bufferB.array() sameElements Array[Byte](3, 4, 5))
+      assert(bread == 5l)
+      assert(bufferA.array() sameElements Array[Byte](1, 2))
+      assert(bufferB.array() sameElements Array[Byte](3, 4, 5))
 
       channel.close()
     }
   }
 
-  @Test def fileChannelCanWriteToFile(): Unit = {
+  test("A FileChannel can write to a file") {
     withTemporaryDirectory { dir =>
       val f     = dir.resolve("f")
       val bytes = Array.apply[Byte](1, 2, 3, 4, 5)
@@ -73,14 +68,14 @@ class FileChannelTest {
       val in = Files.newInputStream(f)
       var i  = 0
       while (i < bytes.length) {
-        assertTrue(in.read() == bytes(i))
+        assert(in.read() == bytes(i))
         i += 1
       }
 
     }
   }
 
-  @Test def fileChannelCanOverwriteFile(): Unit = {
+  test("A FileChannel can overwrite a file") {
     withTemporaryDirectory { dir =>
       val f = dir.resolve("file")
       Files.write(f, "hello, world".getBytes("UTF-8"))
@@ -94,57 +89,58 @@ class FileChannelTest {
       val in = Files.newInputStream(f)
       var i  = 0
       while (i < bytes.length) {
-        assertTrue(in.read() == bytes(i))
+        assert(in.read() == bytes(i))
         i += 1
       }
     }
   }
 
-  @Test def fileChannelWritesAtTheBeginningUnlessOtherwiseSpecified(): Unit = {
+  test("A file channel writes at the beginning, unless otherwise specified") {
     withTemporaryDirectory { dir =>
       val f = dir.resolve("f")
       Files.write(f, "abcdefgh".getBytes("UTF-8"))
       val lines = Files.readAllLines(f)
-      assertTrue(lines.size() == 1)
-      assertTrue(lines.get(0) == "abcdefgh")
+      assert(lines.size() == 1)
+      assert(lines.get(0) == "abcdefgh")
 
       val c   = FileChannel.open(f, StandardOpenOption.WRITE)
       val src = ByteBuffer.wrap("xyz".getBytes("UTF-8"))
       while (src.remaining() > 0) c.write(src)
 
       val newLines = Files.readAllLines(f)
-      assertTrue(newLines.size() == 1)
-      assertTrue(newLines.get(0) == "xyzdefgh")
+      assert(newLines.size() == 1)
+      assert(newLines.get(0) == "xyzdefgh")
     }
   }
 
-  @Test def cannotCombineAppendAndTruncateExisting(): Unit = {
+  test("Cannot combine APPEND and TRUNCATE_EXISTING") {
     withTemporaryDirectory { dir =>
       val f = dir.resolve("f")
-      assertThrows(classOf[IllegalArgumentException],
-                   FileChannel.open(f,
-                                    StandardOpenOption.APPEND,
-                                    StandardOpenOption.TRUNCATE_EXISTING))
+      assertThrows[IllegalArgumentException] {
+        FileChannel.open(f,
+                         StandardOpenOption.APPEND,
+                         StandardOpenOption.TRUNCATE_EXISTING)
+      }
     }
   }
 
-  @Test def cannotCombineAppendAndRead(): Unit = {
+  test("Cannot combine APPEND and READ") {
     withTemporaryDirectory { dir =>
       val f = dir.resolve("f")
-      assertThrows(
-        classOf[IllegalArgumentException],
-        FileChannel.open(f, StandardOpenOption.APPEND, StandardOpenOption.READ))
+      assertThrows[IllegalArgumentException] {
+        FileChannel.open(f, StandardOpenOption.APPEND, StandardOpenOption.READ)
+      }
     }
   }
 
-  @Test def canWriteToChannelWithAppend(): Unit = {
+  test("Can write to a channel with APPEND") {
     withTemporaryDirectory { dir =>
       val f = dir.resolve("f")
       Files.write(f, "hello, ".getBytes("UTF-8"))
 
       val lines = Files.readAllLines(f)
-      assertTrue(lines.size() == 1)
-      assertTrue(lines.get(0) == "hello, ")
+      assert(lines.size() == 1)
+      assert(lines.get(0) == "hello, ")
 
       val bytes   = "world".getBytes("UTF-8")
       val src     = ByteBuffer.wrap(bytes)
@@ -152,15 +148,15 @@ class FileChannelTest {
       while (src.remaining() > 0) channel.write(src)
 
       val newLines = Files.readAllLines(f)
-      assertTrue(newLines.size() == 1)
-      assertTrue(newLines.get(0) == "hello, world")
+      assert(newLines.size() == 1)
+      assert(newLines.get(0) == "hello, world")
     }
   }
 
   def withTemporaryDirectory(fn: Path => Unit) {
     val file = File.createTempFile("test", ".tmp")
-    assertTrue(file.delete())
-    assertTrue(file.mkdir())
+    assert(file.delete())
+    assert(file.mkdir())
     fn(file.toPath)
   }
 }
