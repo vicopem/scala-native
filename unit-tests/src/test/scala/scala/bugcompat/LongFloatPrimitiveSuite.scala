@@ -1,9 +1,6 @@
-package scala.bugcompat
+package scala
 
-import org.junit.Test
-import org.junit.Assert._
-
-class LongFloatPrimitiveTest {
+object LongFloatPrimitiveSuite extends tests.Suite {
   @inline def inlineFloat(): Float =
     java.lang.Float.intBitsToFloat(1079290514)
   @noinline def noinlineFloat(): Float =
@@ -13,8 +10,8 @@ class LongFloatPrimitiveTest {
   @noinline def noinlineLong(): Long =
     1412906027847L
 
-  @Test def scalaBugIssue11253(): Unit = {
-    assertEquals(noinlineLong % noinlineFloat, 2.3242621f, 0.0f)
-    assertEquals(inlineLong   % inlineFloat, 2.3242621f, 0.0f)
+  test("scala/bug/issues/11253") {
+    assert(noinlineLong % noinlineFloat == 2.3242621F)
+    assert(inlineLong   % inlineFloat == 2.3242621F)
   }
 }

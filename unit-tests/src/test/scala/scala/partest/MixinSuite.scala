@@ -1,18 +1,16 @@
 package scala
 package partest
 
-import org.junit.Test
-import org.junit.Assert._
-
-class MixinTest {
+object MixinSuite extends tests.Suite {
   var messages: List[String] = Nil
   def log(msg: String)       = messages ::= msg
   def clear(): Unit          = messages = Nil
-  def testEffects(name: String)(effects: String*)(body: => Unit): Unit = {
-    clear()
-    body
-    assertTrue(name, messages.reverse == effects)
-  }
+  def testEffects(name: String)(effects: String*)(body: => Unit): Unit =
+    test(name) {
+      clear()
+      body
+      assert(messages.reverse == effects)
+    }
 
   // Test 1: "super" coming from mixins
 
@@ -86,9 +84,8 @@ class MixinTest {
   }
 
   // Actual tests
-  @Test def runTestEffects(): Unit = {
-    testEffects("1")("M1::B::f") { Test1.test() }
-    testEffects("2")("M1::f M2::f M3::f") { Test2.test() }
-    testEffects("3")("one", "two", "A", "B", "C") { Test3.test() }
-  }
+
+  testEffects("1")("M1::B::f") { Test1.test() }
+  testEffects("2")("M1::f M2::f M3::f") { Test2.test() }
+  testEffects("3")("one", "two", "A", "B", "C") { Test3.test() }
 }

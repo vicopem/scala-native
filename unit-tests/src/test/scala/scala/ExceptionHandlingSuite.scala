@@ -1,9 +1,6 @@
 package scala
 
-import org.junit.Test
-import org.junit.Assert._
-
-class ExceptionHandlingTest {
+object ExceptionHandlingSuite extends tests.Suite {
   class A extends Exception
   class B extends Exception
   class C extends Exception
@@ -12,8 +9,8 @@ class ExceptionHandlingTest {
   def throwB() = throw new B
   def throwC() = throw new C
 
-  @Test def test1(): Unit = {
-    assertTrue {
+  test("1") {
+    assert {
       try {
         try throwB()
         catch {
@@ -25,8 +22,8 @@ class ExceptionHandlingTest {
     }
   }
 
-  @Test def test2(): Unit = {
-    assertTrue {
+  test("2") {
+    assert {
       try throwA()
       catch {
         case a: A => true
@@ -35,8 +32,8 @@ class ExceptionHandlingTest {
     }
   }
 
-  @Test def test3(): Unit = {
-    assertTrue {
+  test("3") {
+    assert {
       try throwB()
       catch {
         case a: A => false
