@@ -364,7 +364,7 @@ lazy val posixlib =
     .in(file("posixlib"))
     .enablePlugins(MyScalaNativePlugin)
     .settings(mavenPublishSettings)
-    .dependsOn(nscplugin % "plugin", nativelib)
+    .dependsOn(nscplugin % "plugin", clib)
 
 lazy val javalib =
   project
@@ -394,7 +394,7 @@ lazy val javalib =
       },
       exportJars := true
     )
-    .dependsOn(nscplugin % "plugin", posixlib, clib)
+    .dependsOn(nscplugin % "plugin", nativelib, posixlib)
 
 val fetchScalaSource =
   taskKey[File]("Fetches the scala source for the current scala version")

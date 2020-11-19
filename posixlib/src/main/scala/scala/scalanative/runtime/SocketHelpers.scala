@@ -3,6 +3,7 @@ package runtime
 
 import scala.scalanative.unsigned._
 import scala.scalanative.unsafe._
+import scala.scalanative.libc._
 import scala.scalanative.posix.{netdb, netdbOps}, netdb._, netdbOps._
 import scala.scalanative.posix.arpa.inet._
 import scala.scalanative.posix.sys.socketOps._
@@ -23,7 +24,7 @@ object SocketHelpers {
       var hints = alloc[addrinfo]
       var ret   = alloc[Ptr[addrinfo]]
 
-      libc.memset(hints.rawptr, 0, sizeof[addrinfo])
+      string.memset(hints.asInstanceOf[Ptr[Byte]], 0, sizeof[addrinfo])
       hints.ai_family = AF_UNSPEC
       hints.ai_protocol = 0
       hints.ai_addr = null
@@ -111,7 +112,7 @@ object SocketHelpers {
       var ret   = alloc[Ptr[addrinfo]]
 
       var ipstr = alloc[CChar](INET6_ADDRSTRLEN + 1)
-      libc.memset(hints.rawptr, 0, sizeof[addrinfo])
+      string.memset(hints.asInstanceOf[Ptr[Byte]], 0, sizeof[addrinfo])
       hints.ai_family = AF_UNSPEC
       hints.ai_socktype = 0
       hints.ai_next = null
@@ -145,7 +146,7 @@ object SocketHelpers {
       var hints = alloc[addrinfo]
       var ret   = alloc[Ptr[addrinfo]]
 
-      libc.memset(hints.rawptr, 0, sizeof[addrinfo])
+      string.memset(hints.asInstanceOf[Ptr[Byte]], 0, sizeof[addrinfo])
       hints.ai_family = AF_UNSPEC
       hints.ai_socktype = SOCK_STREAM
       hints.ai_protocol = 0

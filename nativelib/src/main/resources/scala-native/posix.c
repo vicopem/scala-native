@@ -1,6 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <math.h>
 #include <errno.h>
 
-// Omitting EDOM EILSEQ and ERANGE since they are in clib
+extern char **environ;
+
+// This file contains functions that wrap posix
+// built-in macros. We need this because Scala Native
+// can not expand C macros, and that's the easiest way to
+// get the values out of those in a portable manner.
+
+// Omitting EDOM EILSEQ and ERANGE since they are duplicated in wrap.c
 int scalanative_e2big() { return E2BIG; }
 
 int scalanative_eacces() { return EACCES; }
@@ -154,3 +165,5 @@ int scalanative_etxtbsy() { return ETXTBSY; }
 int scalanative_ewouldblock() { return EWOULDBLOCK; }
 
 int scalanative_exdev() { return EXDEV; }
+
+char **scalanative_environ() { return environ; }
