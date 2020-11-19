@@ -2,12 +2,14 @@ package scala.scalanative
 
 import scala.reflect.internal.util.{BatchSourceFile, NoFile, SourceFile}
 import scala.reflect.internal.util.Position
+
 import scala.tools.cmd.CommandLineParser
 import scala.tools.nsc.{CompilerCommand, Global, Settings}
 import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.reporters.AbstractReporter
+
 import java.nio.file.{Files, Path}
 import java.io.File
-import scala.scalanative.compiler.CompatReporter
 
 /**
  * Helper class to compile snippets of code.
@@ -55,12 +57,14 @@ class NIRCompiler(outputDir: Path) extends api.NIRCompiler {
    * on ERRORs.
    */
   private class TestReporter(override val settings: Settings)
-      extends CompatReporter {
-    override def add(pos: Position, msg: String, severity: Severity): Unit =
+      extends AbstractReporter {
+    override def display(pos: Position, msg: String, severity: Severity): Unit =
       severity match {
-        case ERROR => reportError(msg)
-        case _     => ()
+        case INFO | WARNING => ()
+        case ERROR          => reportError(msg)
       }
+
+    override def displayPrompt(): Unit = ()
   }
 
   /**

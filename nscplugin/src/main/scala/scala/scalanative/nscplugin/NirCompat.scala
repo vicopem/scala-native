@@ -4,8 +4,11 @@ package nscplugin
 import scala.reflect.internal.Flags
 import scala.tools.nsc._
 
-trait NirCompat[G <: Global with Singleton] { self: NirGenPhase[G] =>
+trait NirCompat { self: NirGenPhase =>
   import NirCompat.{infiniteLoop, noImplClasses}
+
+  val global: Global
+
   import global._
 
   // SAMFunction was introduced in 2.12 for LMF-capable SAM type

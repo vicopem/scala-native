@@ -3,8 +3,7 @@ package nscplugin
 
 import scala.tools.nsc._
 
-trait NirDefinitions {
-  val global: Global
+trait NirDefinitions { self: NirGlobalAddons =>
   import global._
   import definitions._
   import rootMirror._
@@ -227,26 +226,23 @@ trait NirDefinitions {
       'O' -> getRequiredClass("scala.scalanative.runtime.ObjectArray")
     )
 
-    private def mapValue[K, V1, V2](fn: V1 => V2)(in: (K, V1)): (K, V2) =
-      (in._1, fn(in._2))
-
     lazy val RuntimeArrayModule: Map[Char, Symbol] =
-      RuntimeArrayClass.map(mapValue(_.companion))
+      RuntimeArrayClass.mapValues(_.companion)
 
     lazy val RuntimeArrayAllocMethod: Map[Char, Symbol] =
-      RuntimeArrayModule.map(mapValue(getMember(_, TermName("alloc"))))
+      RuntimeArrayModule.mapValues(getMember(_, TermName("alloc")))
 
     lazy val RuntimeArrayApplyMethod: Map[Char, Symbol] =
-      RuntimeArrayClass.map(mapValue(getMember(_, TermName("apply"))))
+      RuntimeArrayClass.mapValues(getMember(_, TermName("apply")))
 
     lazy val RuntimeArrayUpdateMethod: Map[Char, Symbol] =
-      RuntimeArrayClass.map(mapValue(getMember(_, TermName("update"))))
+      RuntimeArrayClass.mapValues(getMember(_, TermName("update")))
 
     lazy val RuntimeArrayLengthMethod: Map[Char, Symbol] =
-      RuntimeArrayClass.map(mapValue(getMember(_, TermName("length"))))
+      RuntimeArrayClass.mapValues(getMember(_, TermName("length")))
 
     lazy val RuntimeArrayCloneMethod: Map[Char, Symbol] =
-      RuntimeArrayClass.map(mapValue(getMember(_, TermName("clone"))))
+      RuntimeArrayClass.mapValues(getMember(_, TermName("clone")))
 
     lazy val RuntimeBoxesModule = getRequiredModule(
       "scala.scalanative.runtime.Boxes")

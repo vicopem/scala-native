@@ -2,6 +2,7 @@ package scala.scalanative
 package build
 
 import java.nio.file.{Files, Path, Paths}
+import scala.collection.JavaConverters._
 import scala.util.Try
 import scala.sys.process._
 import scalanative.build.IO.RichPath
@@ -84,13 +85,14 @@ object Discover {
     if (exit != 0) {
       fail
     } else {
-      val linesIter = Files.readAllLines(targetll).iterator()
-      while (linesIter.hasNext()) {
-        val line = linesIter.next()
-        if (line.startsWith("target triple"))
-          return line.split("\"").apply(1)
-      }
-      fail
+      Files
+        .readAllLines(targetll)
+        .asScala
+        .collectFirst {
+          case line if line.startsWith("target triple") =>
+            line.split("\"").apply(1)
+        }
+        .getOrElse(fail)
     }
   }
 

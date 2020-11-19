@@ -1,6 +1,6 @@
 package java.io
 
-import scala.scalanative.compat.StreamsCompat._
+import scala.collection.immutable.{Stream => SStream}
 import java.util.stream.{Stream, WrappedScalaStream}
 
 class BufferedReader(in: Reader, sz: Int) extends Reader {
@@ -161,6 +161,9 @@ class BufferedReader(in: Reader, sz: Int) extends Reader {
       pos += 1
     }
   }
+
+  private def toScalaStream(): SStream[String] =
+    toScalaStream(false)
 
   private[this] def toScalaStream(closeAtEnd: Boolean): SStream[String] = {
     Option(readLine()) match {

@@ -1,5 +1,7 @@
 package java.io
 
+import scala.compat.Platform.EOL
+
 class BufferedWriter(out: Writer, sz: Int) extends Writer {
 
   if (sz <= 0) throw new IllegalArgumentException("Buffer size <= 0")
@@ -24,7 +26,7 @@ class BufferedWriter(out: Writer, sz: Int) extends Writer {
   }
 
   def newLine(): Unit =
-    write(System.lineSeparator(), 0, System.lineSeparator().length)
+    write(EOL, 0, EOL.length)
 
   override def write(c: Int): Unit =
     write(Array(c.toChar), 0, 1)

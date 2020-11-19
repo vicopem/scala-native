@@ -100,8 +100,7 @@ private[math] object Conversion {
           @tailrec
           def innerLoop(): Unit = {
             currentChar -= 1
-            result =
-              Character.forDigit(resDigit % radix, radix).toString + result
+            result = Character.forDigit(resDigit % radix, radix) + result
             resDigit /= radix
             if (resDigit != 0 && currentChar != 0)
               innerLoop()
@@ -112,7 +111,7 @@ private[math] object Conversion {
           var i: Int = 0
           while (i < delta && currentChar > 0) {
             currentChar -= 1
-            result = "0" + result
+            result = '0' + result
             i += 1
           }
           i = tempLen - 1
@@ -131,15 +130,14 @@ private[math] object Conversion {
           while (j < 8 && currentChar > 0) {
             resDigit = digits(i) >> (j << 2) & 0xf
             currentChar -= 1
-            result =
-              java.lang.Character.forDigit(resDigit, 16).toString + result
+            result = java.lang.Character.forDigit(resDigit, 16) + result
             j += 1
           }
         }
       }
       // strip leading zero's
       result = result.dropWhile(_ == '0')
-      if (sign == -1) "-" + result
+      if (sign == -1) '-' + result
       else result
     }
   }
@@ -179,7 +177,7 @@ private[math] object Conversion {
             val prev = v
             v /= 10
             currentChar -= 1
-            result = (prev - v * 10).toString + result
+            result = (48 + (prev - v * 10).toInt).toChar + result
           } while (v != 0)
         } else {
           var v: Int = highDigit
@@ -187,7 +185,7 @@ private[math] object Conversion {
             val prev = v
             v /= 10
             currentChar -= 1
-            result = (prev - v * 10).toString + result
+            result = (48 + (prev - v * 10)).toChar + result
           } while (v != 0)
         }
       } else {
@@ -216,7 +214,7 @@ private[math] object Conversion {
           @tailrec
           def innerLoop(): Unit = {
             currentChar -= 1
-            result = (resDigit % 10).toString + result
+            result = (48 + (resDigit % 10)).toChar + result
             resDigit /= 10
             if (resDigit != 0 && currentChar != 0)
               innerLoop()
@@ -228,7 +226,7 @@ private[math] object Conversion {
           var i     = 0
           while ((i < delta) && (currentChar > 0)) {
             currentChar -= 1
-            result = "0" + result
+            result = '0' + result
             i += 1
           }
           var j = tempLen - 1
@@ -236,13 +234,13 @@ private[math] object Conversion {
             j -= 1
           }
           tempLen = j + 1
-          if (!(j == 0 && (temp(j) == 0))) loop()
+          if (!(j == 0 && (temp(j) == 0))) loop
         }
 
         loop()
         result = result.dropWhile(_ == '0')
       }
-      if (sign < 0) "-" + result
+      if (sign < 0) '-' + result
       else result
     }
   }
@@ -283,7 +281,7 @@ private[math] object Conversion {
         val prev = v
         v /= 10
         currentChar -= 1
-        result = (prev - v * 10).toString + result
+        result = (48 + (prev - v * 10)).toChar + result
       } while (v != 0)
 
       val exponent: Long = resLengthInChars - currentChar - scale.toLong - 1
@@ -296,7 +294,7 @@ private[math] object Conversion {
         } else {
           // special case 2
           for (j <- 0 until -index) {
-            result = "0" + result
+            result = '0' + result
           }
           result = "0." + result
         }
@@ -312,7 +310,7 @@ private[math] object Conversion {
             result + exponentStr
       }
 
-      if (negNumber) "-" + result
+      if (negNumber) '-' + result
       else result
     }
   }
@@ -336,7 +334,7 @@ private[math] object Conversion {
   def bigInteger2Double(bi: BigInteger): Double = {
     if (bi.numberLength < 2 ||
         ((bi.numberLength == 2) && (bi.digits(1) > 0))) {
-      bi.longValue().toDouble
+      bi.longValue()
     } else if (bi.numberLength > 32) {
       if (bi.sign > 0) Double.PositiveInfinity
       else Double.NegativeInfinity

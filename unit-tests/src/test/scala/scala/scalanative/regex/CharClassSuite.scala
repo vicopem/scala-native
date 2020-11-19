@@ -10,7 +10,7 @@ object CharClassSuite extends tests.Suite {
 
   private def assertClass(cc: CharClass, expected: Array[Int]): Unit = {
     val actual = cc.toArray
-    if (!(actual.sameElements(expected)))
+    if (actual.deep != expected.deep)
       throw new AssertionError(
         "Incorrect CharClass value:\n" + "Expected: " + expected
           .mkString(", ") + "\n" + "Actual:   " + actual.mkString(", "))
