@@ -1,32 +1,28 @@
 package java.nio.file
 
-import org.junit.Test
-import org.junit.Assert._
+object FileSystemExceptionSuite extends tests.Suite {
 
-class FileSystemExceptionTest {
-
-  @Test def fileSystemExceptionGetMessageFormatsErrorMessage(): Unit = {
-    assertTrue(
+  test("FileSystemException.getMessage() formats error message") {
+    assert(
       new FileSystemException("file", "other", "reason")
         .getMessage() == "file -> other: reason")
-    assertTrue(
+    assert(
       new FileSystemException("file", "other", null)
         .getMessage() == "file -> other")
-    assertTrue(
+    assert(
       new FileSystemException("file", null, "reason")
         .getMessage() == "file: reason")
-    assertTrue(
+    assert(
       new FileSystemException(null, "other", "reason")
         .getMessage() == " -> other: reason")
-    assertTrue(
+    assert(
       new FileSystemException(null, null, "reason").getMessage() == ": reason")
-    assertTrue(
+    assert(
       new FileSystemException(null, "other", null).getMessage() == " -> other")
-    assertTrue(
-      new FileSystemException("file", null, null).getMessage() == "file")
-    assertTrue(new FileSystemException(null, null, null).getMessage() == "")
+    assert(new FileSystemException("file", null, null).getMessage() == "file")
+    assert(new FileSystemException(null, null, null).getMessage() == "")
 
-    assertTrue(new FileSystemException("file").getMessage() == "file")
-    assertTrue(new FileSystemException(null).getMessage() == "")
+    assert(new FileSystemException("file").getMessage() == "file")
+    assert(new FileSystemException(null).getMessage() == "")
   }
 }

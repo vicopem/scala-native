@@ -1,15 +1,10 @@
 package java.nio.file
 
-import org.junit.Test
-import org.junit.Assert._
+import FilesSuite.withTemporaryDirectory
 
-import scalanative.junit.utils.AssertThrows._
+object DirectoryStreamSuite extends tests.Suite {
 
-import FilesTest.withTemporaryDirectory
-
-class DirectoryStreamTest {
-
-  @Test def filesNewDirectoryStreamPath(): Unit = {
+  test("Files.newDirectoryStream(Path)") {
     withTemporaryDirectory { dirFile =>
       val dir = dirFile.toPath()
       val f0  = dir.resolve("f0")
@@ -21,10 +16,10 @@ class DirectoryStreamTest {
       Files.createFile(f0)
       Files.createFile(f1)
       Files.createFile(f2)
-      assertTrue(Files.exists(d0) && Files.isDirectory(d0))
-      assertTrue(Files.exists(f0) && Files.isRegularFile(f0))
-      assertTrue(Files.exists(f1) && Files.isRegularFile(f1))
-      assertTrue(Files.exists(f2) && Files.isRegularFile(f2))
+      assert(Files.exists(d0) && Files.isDirectory(d0))
+      assert(Files.exists(f0) && Files.isRegularFile(f0))
+      assert(Files.exists(f1) && Files.isRegularFile(f1))
+      assert(Files.exists(f2) && Files.isRegularFile(f2))
 
       val stream   = Files.newDirectoryStream(dir)
       val expected = Set(f0, f1, d0)
@@ -34,11 +29,11 @@ class DirectoryStreamTest {
       while (it.hasNext()) {
         result += it.next()
       }
-      assertTrue(result == expected)
+      assert(result == expected)
     }
   }
 
-  @Test def filesNewDirectoryStreamPathDirectoryStreamFilterPath(): Unit = {
+  test("Files.newDirectoryStream(Path, DirectoryStream.Filter[Path])") {
     withTemporaryDirectory { dirFile =>
       val dir = dirFile.toPath()
       val f0  = dir.resolve("f0")
@@ -50,10 +45,10 @@ class DirectoryStreamTest {
       Files.createFile(f0)
       Files.createFile(f1)
       Files.createFile(f2)
-      assertTrue(Files.exists(d0) && Files.isDirectory(d0))
-      assertTrue(Files.exists(f0) && Files.isRegularFile(f0))
-      assertTrue(Files.exists(f1) && Files.isRegularFile(f1))
-      assertTrue(Files.exists(f2) && Files.isRegularFile(f2))
+      assert(Files.exists(d0) && Files.isDirectory(d0))
+      assert(Files.exists(f0) && Files.isRegularFile(f0))
+      assert(Files.exists(f1) && Files.isRegularFile(f1))
+      assert(Files.exists(f2) && Files.isRegularFile(f2))
 
       val filter = new DirectoryStream.Filter[Path] {
         override def accept(p: Path): Boolean = !p.toString.endsWith("f1")
@@ -66,27 +61,34 @@ class DirectoryStreamTest {
       while (it.hasNext()) {
         result += it.next()
       }
-      assertTrue(result == expected)
+      assert(result == expected)
     }
   }
 
-  @Test def cannotGetIteratorMoreThanOnce(): Unit = {
+  test("Cannot get iterator more than once") {
     val stream = Files.newDirectoryStream(Paths.get("."))
     stream.iterator()
-    assertThrows(classOf[IllegalStateException], stream.iterator())
+    assertThrows[IllegalStateException] {
+      stream.iterator()
+    }
   }
 
-  @Test def cannotGetAnIteratorAfterClose(): Unit = {
+  test("Cannot get an iterator after close()") {
     val stream = Files.newDirectoryStream(Paths.get("."))
     stream.close()
-    assertThrows(classOf[IllegalStateException], stream.iterator())
+    assertThrows[IllegalStateException] {
+      stream.iterator()
+    }
   }
 
-  @Test def hasNextReturnsFalseAfterStreamIsClosed(): Unit = {
+  test("hasNext returns false after stream is closed") {
     val stream = Files.newDirectoryStream(Paths.get("."))
     val it     = stream.iterator()
     stream.close()
-    assertFalse(it.hasNext())
-    assertThrows(classOf[NoSuchElementException], it.next())
+    assert(!it.hasNext())
+    assertThrows[NoSuchElementException] {
+      it.next()
+    }
   }
+
 }
