@@ -9,7 +9,7 @@ class ConsumerTest {
   var amount = 1
 
   @Before
-  def setUp(): Unit = {
+  protected def setUp(): Unit = {
     var amount = 1
   }
 

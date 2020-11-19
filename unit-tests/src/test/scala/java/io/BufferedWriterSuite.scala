@@ -1,37 +1,34 @@
 package java.io
 
-import org.junit.Test
-import org.junit.Assert._
+object BufferedWriterSuite extends tests.Suite {
 
-import scalanative.junit.utils.AssertThrows._
-
-class BufferedWriterTest {
-
-  @Test def creatingBufferedWriterWithBufferSizeZeroThrowsException(): Unit = {
+  test(
+    "Creating a `BufferedWriter` with a buffer of size 0 throws an exception") {
     val writer = new OutputStreamWriter(new ByteArrayOutputStream)
-    assertThrows(classOf[IllegalArgumentException],
-                 new BufferedWriter(writer, -1))
+    assertThrows[IllegalArgumentException] {
+      new BufferedWriter(writer, -1)
+    }
   }
 
-  @Test def canWriteSmallChunksToBufferedWriter(): Unit = {
+  test("Can write small chunks to a `BufferedWriter`") {
     val stream = new ByteArrayOutputStream
     val writer = new BufferedWriter(new OutputStreamWriter(stream))
     val string = "Hello, world!"
     writer.write(string)
     writer.flush()
-    assertTrue(stream.toString == string)
+    assert(stream.toString == string)
   }
 
-  @Test def canWriteChunkLargerThanBufferSizeToBufferedWriter(): Unit = {
+  test("Can write a chunk larger than buffer size to a `BufferedWriter`") {
     val stream = new ByteArrayOutputStream
     val writer = new BufferedWriter(new OutputStreamWriter(stream), 1)
     val string = "Hello, world!"
     writer.write(string)
     writer.flush()
-    assertTrue(stream.toString == string)
+    assert(stream.toString == string)
   }
 
-  @Test def closingTwiceIsHarmless(): Unit = {
+  test("Closing twice is harmless") {
     val stream = new ByteArrayOutputStream
     val writer = new BufferedWriter(new OutputStreamWriter(stream))
     writer.close()

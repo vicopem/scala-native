@@ -1,14 +1,11 @@
 package java.io
 
-import org.junit.Test
+object PrintStreamSuite extends tests.Suite {
 
-import scalanative.junit.utils.AssertThrows._
-
-class PrintStreamTest {
-
-  @Test def printStreamOutputStreamStringWithUnsupportedEncoding(): Unit = {
-    assertThrows(classOf[java.io.UnsupportedEncodingException],
-                 new PrintStream(new File("/dev/null"), "unsupported encoding"))
+  test("PrintStream(OutputStream, String) with unsupported encoding") {
+    assertThrows[java.io.UnsupportedEncodingException] {
+      new PrintStream(new File("/dev/null"), "unsupported encoding")
+    }
   }
 
   // The careful reader would expect to see tests for the constructors

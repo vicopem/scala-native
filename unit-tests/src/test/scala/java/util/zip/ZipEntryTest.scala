@@ -211,7 +211,7 @@ class ZipEntryTest {
   }
 
   @Before
-  def setUp(): Unit = {
+  protected def setUp(): Unit = {
     zfile = getZipFile(zipFile)
     zentry = zfile.getEntry("File1.txt")
     orgSize = zentry.getSize()
