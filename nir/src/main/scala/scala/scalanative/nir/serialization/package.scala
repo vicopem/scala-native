@@ -1,8 +1,9 @@
 package scala.scalanative
 package nir
 
-import java.io.OutputStream
 import java.nio._
+import java.nio.file.{StandardOpenOption => OpenOpt, _}
+import java.nio.channels._
 
 package object serialization {
   def serializeText(defns: Seq[Defn], buffer: ByteBuffer): Unit = {
@@ -11,19 +12,9 @@ package object serialization {
     buffer.put(builder.toString.getBytes)
   }
 
-  @inline
-  private def withBigEndian[T](buf: ByteBuffer)(body: ByteBuffer => T): T = {
-    val o = buf.order()
-    buf.order(ByteOrder.BIG_ENDIAN)
-    try body(buf)
-    finally buf.order(o)
-  }
-
-  def serializeBinary(defns: Seq[Defn], out: OutputStream): Unit =
-    new BinarySerializer().serialize(defns, out)
+  def serializeBinary(defns: Seq[Defn], buffer: ByteBuffer): Unit =
+    (new BinarySerializer(buffer)).serialize(defns)
 
   def deserializeBinary(buffer: ByteBuffer): Seq[Defn] =
-    withBigEndian(buffer) {
-      new BinaryDeserializer(_).deserialize()
-    }
+    (new BinaryDeserializer(buffer)).deserialize()
 }
