@@ -9,11 +9,7 @@ import scala.scalanative.unsafe._
 import scala.scalanative.posix.{fcntl, unistd}
 import scala.io.Source
 
-import org.junit.Test
-import org.junit.Assert._
-
-class ProcessTest {
-  import ProcessUtils._
+object ProcessSuite extends tests.Suite {
 
   private def assertProcessExitOrTimeout(process: Process): Unit = {
     // Suspend execution of the test until either the specified
@@ -33,22 +29,32 @@ class ProcessTest {
     val tmo    = 5
     val tmUnit = TimeUnit.SECONDS
 
-    assertTrue(s"Process took more than $tmo ${tmUnit.name} to exit.",
-               process.waitFor(tmo, tmUnit))
+    assert(process.waitFor(tmo, tmUnit),
+           s"Process took more than $tmo ${tmUnit.name} to exit.")
+  }
+
+  def readInputStream(s: InputStream) = Source.fromInputStream(s).mkString
+
+  val resourceDir =
+    s"${System.getProperty("user.dir")}/unit-tests/src/test/resources/process"
+
+  // This makes it easy to decorate the test for debugging
+  def addTest[R](name: String)(f: => R): Unit = test(name) {
+    f
   }
 
   val scripts = Set("echo.sh", "err.sh", "ls", "hello.sh")
 
-  @Test def ls(): Unit = {
+  addTest("ls") {
     val proc = new ProcessBuilder("ls", resourceDir).start()
     val out  = readInputStream(proc.getInputStream)
 
     assertProcessExitOrTimeout(proc)
 
-    assertTrue(out.split("\n").toSet == scripts)
+    assert(out.split("\n").toSet == scripts)
   }
 
-  @Test def inherit(): Unit = {
+  addTest("inherit") {
     val f       = Files.createTempFile("/tmp", "out")
     val savedFD = unistd.dup(unistd.STDOUT_FILENO)
     val flags   = fcntl.O_RDWR | fcntl.O_TRUNC | fcntl.O_CREAT
@@ -66,7 +72,7 @@ class ProcessTest {
         unistd.dup2(savedFD, unistd.STDOUT_FILENO)
         fcntl.close(savedFD)
       }
-    assertTrue(out.split("\n").toSet == scripts)
+    assert(out.split("\n").toSet == scripts)
   }
 
   private def checkPathOverride(pb: ProcessBuilder) = {
@@ -75,22 +81,22 @@ class ProcessTest {
 
     assertProcessExitOrTimeout(proc)
 
-    assertTrue(out == "1")
+    assert(out == "1")
   }
 
-  @Test def pathOverride(): Unit = {
+  addTest("PATH override") {
     val pb = new ProcessBuilder("ls", resourceDir)
     pb.environment.put("PATH", resourceDir)
     checkPathOverride(pb)
   }
 
-  @Test def pathPrefixOverride(): Unit = {
+  addTest("PATH prefix override") {
     val pb = new ProcessBuilder("ls", resourceDir)
     pb.environment.put("PATH", s"$resourceDir:${pb.environment.get("PATH")}")
     checkPathOverride(pb)
   }
 
-  @Test def inputAndErrorStream(): Unit = {
+  addTest("input and error stream") {
     val pb  = new ProcessBuilder("err.sh")
     val cwd = System.getProperty("user.dir")
     pb.environment.put("PATH", s"$cwd/unit-tests/src/test/resources/process")
@@ -98,11 +104,11 @@ class ProcessTest {
 
     assertProcessExitOrTimeout(proc)
 
-    assertTrue(readInputStream(proc.getErrorStream) == "foo")
-    assertTrue(readInputStream(proc.getInputStream) == "bar")
+    assert(readInputStream(proc.getErrorStream) == "foo")
+    assert(readInputStream(proc.getInputStream) == "bar")
   }
 
-  @Test def inputStreamWritesToFile(): Unit = {
+  addTest("input stream writes to file") {
     val pb = new ProcessBuilder("echo.sh")
     pb.environment.put("PATH", resourceDir)
     val file = File.createTempFile("istest", ".tmp", new File("/tmp"))
@@ -116,13 +122,13 @@ class ProcessTest {
       assertProcessExitOrTimeout(proc)
 
       val out = Source.fromFile(file.toString).getLines mkString "\n"
-      assertTrue(out == "hello")
+      assert(out == "hello")
     } finally {
       file.delete()
     }
   }
 
-  @Test def outputStreamReadsFromFile(): Unit = {
+  addTest("output stream reads from file") {
     val pb = new ProcessBuilder("echo.sh")
     pb.environment.put("PATH", resourceDir)
     val file = File.createTempFile("istest", ".tmp", new File("/tmp"))
@@ -136,13 +142,13 @@ class ProcessTest {
       assertProcessExitOrTimeout(proc)
 
       val out = readInputStream(proc.getInputStream)
-      assertTrue(out == "hello")
+      assert(out == "hello")
     } finally {
       file.delete()
     }
   }
 
-  @Test def redirectErrorStream(): Unit = {
+  addTest("redirectErrorStream") {
     val pb  = new ProcessBuilder("err.sh")
     val cwd = System.getProperty("user.dir")
     pb.environment.put("PATH", s"$cwd/unit-tests/src/test/resources/process")
@@ -153,21 +159,21 @@ class ProcessTest {
 
     val out = readInputStream(proc.getInputStream)
     val err = readInputStream(proc.getErrorStream)
-    assertTrue(out == "foobar")
-    assertTrue(err == "")
+    assert(out == "foobar")
+    assert(err == "")
   }
 
-  @Test def waitForWithTimeoutCompletes(): Unit = {
+  addTest("waitFor with timeout completes") {
     val proc = new ProcessBuilder("sleep", "0.001").start()
-    assertTrue(proc.waitFor(1, TimeUnit.SECONDS))
-    assertTrue(proc.exitValue == 0)
+    assert(proc.waitFor(1, TimeUnit.SECONDS))
+    assert(proc.exitValue == 0)
   }
 
   // Design Note:
   //  The timing on the next few tests is pretty tight and subject
   //  to race conditions. The process is intended to take only 5 milliseconds
   //  overall. The waitFor(1. TimeUnit.MILLISECONDS) assumes that the
-  //  process has not lived its lifetime by the time the assertTrue()
+  //  process has not lived its lifetime by the time the assert()
   //  executes, a race condition.  Just because two instructions are
   //  right next to each other, does not mean they execute without
   //  intervening interruption or significant elapsed time.
@@ -177,30 +183,30 @@ class ProcessTest {
   //  at least one Clang bug, so let it be until the race trips up
   //  someone else.
 
-  @Test def waitForWithTimeoutTimesOut(): Unit = {
+  addTest("waitFor with timeout times out") {
     val proc = new ProcessBuilder("sleep", "0.005").start()
-    assertTrue(!proc.waitFor(1, TimeUnit.MILLISECONDS))
-    assertTrue(proc.isAlive)
+    assert(!proc.waitFor(1, TimeUnit.MILLISECONDS))
+    assert(proc.isAlive)
     proc.waitFor(1, TimeUnit.SECONDS)
   }
 
-  @Test def destroy(): Unit = {
+  addTest("destroy") {
     val proc = new ProcessBuilder("sleep", "0.005").start()
-    assertTrue(proc.isAlive)
+    assert(proc.isAlive)
     proc.destroy()
-    assertTrue(proc.waitFor(100, TimeUnit.MILLISECONDS))
-    assertTrue(proc.exitValue == 0x80 + 9)
+    assert(proc.waitFor(100, TimeUnit.MILLISECONDS))
+    assert(proc.exitValue == 0x80 + 9)
   }
 
-  @Test def destroyForcibly(): Unit = {
+  addTest("destroyForcibly") {
     val proc = new ProcessBuilder("sleep", "0.005").start()
-    assertTrue(proc.isAlive)
+    assert(proc.isAlive)
     val p = proc.destroyForcibly()
-    assertTrue(p.waitFor(100, TimeUnit.MILLISECONDS))
-    assertTrue(p.exitValue == 0x80 + 9)
+    assert(p.waitFor(100, TimeUnit.MILLISECONDS))
+    assert(p.exitValue == 0x80 + 9)
   }
 
-  @Test def shellFallback(): Unit = {
+  addTest("shell fallback") {
     val pb = new ProcessBuilder("hello.sh")
     pb.environment.put("PATH", resourceDir)
     val proc = pb.start()
@@ -208,6 +214,6 @@ class ProcessTest {
     assertProcessExitOrTimeout(proc)
 
     val out = readInputStream(proc.getInputStream)
-    assertTrue(out == "hello\n")
+    assert(out == "hello\n")
   }
 }

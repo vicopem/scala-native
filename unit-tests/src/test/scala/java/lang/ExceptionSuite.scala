@@ -1,21 +1,18 @@
 package java.lang
 
-import org.junit.Test
-import org.junit.Assert._
-
 class DummyNoStackTraceException extends scala.util.control.NoStackTrace
 
-class ExceptionTest {
-  @Test def printStackTrace(): Unit = {
+object ExceptionSuite extends tests.Suite {
+  test("printStackTrace") {
     val sw = new java.io.StringWriter
     val pw = new java.io.PrintWriter(sw)
     (new Exception).printStackTrace(pw)
     val trace = sw.toString
-    assertTrue(trace.startsWith("java.lang.Exception"))
-    assertTrue(trace.contains("\tat <none>.main(Unknown Source)"))
+    assert(trace.startsWith("java.lang.Exception"))
+    assert(trace.contains("\tat <none>.main(Unknown Source)"))
   }
 
-  @Test def printStackTraceNoStackTraceAvailable(): Unit = {
+  test("printStackTrace <no stack trace available>") {
     val sw = new java.io.StringWriter
     val pw = new java.io.PrintWriter(sw)
     (new DummyNoStackTraceException).printStackTrace(pw)
@@ -24,6 +21,6 @@ class ExceptionTest {
       "java.lang.DummyNoStackTraceException",
       "\t<no stack trace available>"
     ).mkString("\n")
-    assertTrue(trace.startsWith(expected))
+    assert(trace.startsWith(expected))
   }
 }

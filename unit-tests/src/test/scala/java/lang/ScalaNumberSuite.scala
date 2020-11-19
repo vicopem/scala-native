@@ -2,28 +2,28 @@ package java.lang
 
 //  Exercise __scala_==
 
-import org.junit.Test
-import org.junit.Assert._
+object ScalaNumberSuite extends tests.Suite {
 
-class ScalaNumberTest {
+  test("BigInt") { // Section header, visually group tests
+  }
 
-  @Test def bigIntEqualEqualBigInt(): Unit = {
+  test("  BigInt == BigInt") {
     val token                   = 2047L
     val sbi1: scala.math.BigInt = scala.math.BigInt(token)
     val sbi2: scala.math.BigInt = scala.math.BigInt(token)
 
-    assertTrue(sbi1 == sbi2)
+    assert(sbi1 == sbi2)
   }
 
-  @Test def bigIntEqualsBigInt(): Unit = {
+  test("  BigInt.equals(BigInt)") {
     val token                   = 2047L
     val sbi1: scala.math.BigInt = scala.math.BigInt(token)
     val sbi2: scala.math.BigInt = scala.math.BigInt(token)
 
-    assertTrue(sbi1.equals(sbi2))
+    assert(sbi1.equals(sbi2))
   }
 
-  @Test def bigIntDoesNotEqualEqualBigIntWithDifferentValue(): Unit = {
+  test("  BigInt does not == BigInt with different value") {
     val token                   = 2047L
     val sbi1: scala.math.BigInt = scala.math.BigInt(token)
     // avoid powers of 2 because of possible caching.
@@ -32,15 +32,15 @@ class ScalaNumberTest {
     assertFalse(sbi1 == sbi2)
   }
 
-  @Test def bigIntEqualEqualJavaLong(): Unit = {
+  test("  BigInt == j.l.Long") {
     val token                  = Int.MaxValue + 2L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val jl: java.lang.Long     = new java.lang.Long(token.toString)
 
-    assertTrue(sbi == jl)
+    assert(sbi == jl)
   }
 
-  @Test def bigIntDoesNotEqualEqualJavaLongWithDifferentValue(): Unit = {
+  test("  BigInt does not == j.l.Long with different value") {
     val token                  = Int.MaxValue + 2L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val jl: java.lang.Long     = new java.lang.Long((token + 2).toString)
@@ -48,15 +48,15 @@ class ScalaNumberTest {
     assertFalse(sbi == jl)
   }
 
-  @Test def javaLongEqualEqualBigInt(): Unit = {
+  test("  j.l.Long == BigInt") {
     val token                  = Int.MaxValue + 2L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val jl: java.lang.Long     = new java.lang.Long(token.toString)
 
-    assertTrue(jl == sbi)
+    assert(jl == sbi)
   }
 
-  @Test def javaLongDoesNotEqualEqualBigIntWithDifferentValue(): Unit = {
+  test("  j.l.Long does not == BigInt with different value") {
     val token                  = Int.MaxValue + 2L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val jl: java.lang.Long     = new java.lang.Long((token + 2).toString)
@@ -64,15 +64,15 @@ class ScalaNumberTest {
     assertFalse(jl == sbi)
   }
 
-  @Test def javaLongEqualEqualJavaLong(): Unit = {
+  test("  j.l.Long == j.l.Long") {
     val token               = 2047
     val jl1: java.lang.Long = new java.lang.Long(token)
     val jl2: java.lang.Long = new java.lang.Long(token)
 
-    assertTrue(jl1 == jl2)
+    assert(jl1 == jl2)
   }
 
-  @Test def javaLongDoesNotEqualEqualJavaLongWithDifferentValue(): Unit = {
+  test("  j.l.Long does not == j.l.Long with different value") {
     val token               = 2047
     val jl1: java.lang.Long = new java.lang.Long(token)
     val jl2: java.lang.Long = new java.lang.Long(token + 2)
@@ -80,15 +80,15 @@ class ScalaNumberTest {
     assertFalse(jl1 == jl2)
   }
 
-  @Test def bigIntEqualEqualJavaInteger(): Unit = {
+  test("  BigInt == j.l.Integer") {
     val token                  = 2047L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val ji: java.lang.Integer  = new java.lang.Integer(token.toString)
 
-    assertTrue(sbi == ji)
+    assert(sbi == ji)
   }
 
-  @Test def bigIntDoesNotEqualEqualJavaIntegerWithDifferentValue(): Unit = {
+  test("  BigInt does not == j.l.Integer with different value") {
     val token                  = 2047L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val ji: java.lang.Integer  = new java.lang.Integer((token + 2).toString)
@@ -96,15 +96,15 @@ class ScalaNumberTest {
     assertFalse(sbi == ji)
   }
 
-  @Test def javaIntegerEqualEqualBigInt(): Unit = {
+  test("  j.l.Integer == BigInt") {
     val token                  = 2047L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val ji: java.lang.Integer  = new java.lang.Integer(token.toString)
 
-    assertTrue(ji == sbi)
+    assert(ji == sbi)
   }
 
-  @Test def javaIntegerDoesNotEqualEqualBigIntWithDifferentValue(): Unit = {
+  test("  j.l.Integer does not == BigInt with different value") {
     val token                  = 2047L
     val sbi: scala.math.BigInt = scala.math.BigInt(token)
     val ji: java.lang.Integer  = new java.lang.Integer((token + 2).toString)
@@ -112,16 +112,15 @@ class ScalaNumberTest {
     assertFalse(ji == sbi)
   }
 
-  @Test def javaIntegerEqualEqualJavaInteger(): Unit = {
+  test("  j.l.Integer == j.l.Integer") {
     val token                  = 2047
     val ji1: java.lang.Integer = new java.lang.Integer(token)
     val ji2: java.lang.Integer = new java.lang.Integer(token)
 
-    assertTrue(ji1 == ji2)
+    assert(ji1 == ji2)
   }
 
-  @Test def javaIntegerDoesNotEqualEqualJavaIntegerWithDifferentValue()
-      : Unit = {
+  test("  j.l.Integer does not == j.l.Integer with different value") {
     val token                  = 2047
     val ji1: java.lang.Integer = new java.lang.Integer(token)
     val ji2: java.lang.Integer = new java.lang.Integer(token + 2)
@@ -129,23 +128,26 @@ class ScalaNumberTest {
     assertFalse(ji1 == ji2)
   }
 
-  @Test def bigDecimalEqualEqualBigDecimal(): Unit = {
+  test("BigDecimal") { // Section header, visually group tests
+  }
+
+  test("  BigDecimal == BigDecimal") {
     val token                       = 2046.5
     val sbd1: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val sbd2: scala.math.BigDecimal = scala.math.BigDecimal(token)
 
-    assertTrue(sbd1 == sbd2)
+    assert(sbd1 == sbd2)
   }
 
-  @Test def bigDecimalEqualsBigDecimal(): Unit = {
+  test("  BigDecimal.equals(BigDecimal)") {
     val token                       = 2046.5
     val sbd1: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val sbd2: scala.math.BigDecimal = scala.math.BigDecimal(token)
 
-    assertTrue(sbd1.equals(sbd2))
+    assert(sbd1.equals(sbd2))
   }
 
-  @Test def bigDecimalDoesNotEqualEqualBigDecimalWithDifferentValue(): Unit = {
+  test("  BigDecimal does not == BigDecimal with different value") {
     val token                       = 2046.5
     val sbd1: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val sbd2: scala.math.BigDecimal = scala.math.BigDecimal(token - 2.0)
@@ -153,15 +155,15 @@ class ScalaNumberTest {
     assertFalse(sbd1 == sbd2)
   }
 
-  @Test def bigDecimalEqualEqualJavaDouble(): Unit = {
+  test("  BigDecimal == j.l.Double") {
     val token                      = 2046.5
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jd: java.lang.Double       = new java.lang.Double(token.toString)
 
-    assertTrue(sbd == jd)
+    assert(sbd == jd)
   }
 
-  @Test def bigDecimalDoesNotEqualEqualJavaDoubleWithDifferentValue(): Unit = {
+  test("  BigDecimal does not == j.l.Double with different value") {
     val token                      = 2046.5
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jd: java.lang.Double       = new java.lang.Double((token - 2.0).toString)
@@ -169,15 +171,15 @@ class ScalaNumberTest {
     assertFalse(sbd == jd)
   }
 
-  @Test def javaDoubleEqualEqualBigDecimal(): Unit = {
+  test("  j.l.Double == BigDecimal") {
     val token                      = 2046.5
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jd: java.lang.Double       = new java.lang.Double(token.toString)
 
-    assertTrue(jd == sbd)
+    assert(jd == sbd)
   }
 
-  @Test def javaDoubleDoesNotEqualEqualBigDecimalWithDifferentValue(): Unit = {
+  test("  j.l.Double does not == BigDecimal with different value") {
     val token                      = 2046.5
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jd: java.lang.Double       = new java.lang.Double((token - 2.0).toString)
@@ -185,15 +187,15 @@ class ScalaNumberTest {
     assertFalse(sbd == jd)
   }
 
-  @Test def javaDoubleEqualEqualJavaDouble(): Unit = {
+  test("  j.l.Double == j.l.Double") {
     val token                 = 2046.5
     val jd1: java.lang.Double = new java.lang.Double(token)
     val jd2: java.lang.Double = new java.lang.Double(token)
 
-    assertTrue(jd1 == jd2)
+    assert(jd1 == jd2)
   }
 
-  @Test def javaDoubleDoesNotEqualEqualJavaDoubleWithDifferentValue(): Unit = {
+  test("  j.l.Double does not == j.l.Double with different value") {
     val token                 = 2046.5
     val jd1: java.lang.Double = new java.lang.Double(token)
     val jd2: java.lang.Double = new java.lang.Double((token - 2.0).toString)
@@ -201,15 +203,15 @@ class ScalaNumberTest {
     assertFalse(jd1 == jd2)
   }
 
-  @Test def bigDecimalEqualEqualJavaFloat(): Unit = {
+  test("  BigDecimal == j.l.Float") {
     val token                      = 2046.5F
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jf: java.lang.Float        = new java.lang.Float(token.toString)
 
-    assertTrue(sbd == jf)
+    assert(sbd == jf)
   }
 
-  @Test def bigDecimalDoesNotEqualEqualJavaFloatWithDifferentValue(): Unit = {
+  test("  BigDecimal does not == j.l.Float with different value") {
     val token                      = 2046.5F
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jf: java.lang.Float        = new java.lang.Float((token - 2.0).toString)
@@ -217,15 +219,15 @@ class ScalaNumberTest {
     assertFalse(sbd == jf)
   }
 
-  @Test def javaFloatEqualEqualBigDecimal(): Unit = {
+  test("  j.l.Float == BigDecimal") {
     val token                      = 2046.5F
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jf: java.lang.Float        = new java.lang.Float(token.toString)
 
-    assertTrue(jf == sbd)
+    assert(jf == sbd)
   }
 
-  @Test def javaFloatDoesNotEqualEqualBigDecimalWithDifferentValue(): Unit = {
+  test("  j.l.Float does not == BigDecimal with different value") {
     val token                      = 2046.5F
     val sbd: scala.math.BigDecimal = scala.math.BigDecimal(token)
     val jf: java.lang.Float        = new java.lang.Float((token - 2.0).toString)
@@ -233,15 +235,15 @@ class ScalaNumberTest {
     assertFalse(jf == sbd)
   }
 
-  @Test def javaFloatEqualEqualJavaFloat(): Unit = {
+  test("  j.l.Float == j.l.Float") {
     val token                = 2046.5F
     val jf1: java.lang.Float = new java.lang.Float(token)
     val jf2: java.lang.Float = new java.lang.Float(token)
 
-    assertTrue(jf1 == jf2)
+    assert(jf1 == jf2)
   }
 
-  @Test def javaFloatDoesNotEqualEqualJavaFloatWithDifferentValue(): Unit = {
+  test("  j.l.Float does not == j.l.Float with different value") {
     val token                = 2046.5F
     val jf1: java.lang.Float = new java.lang.Float(token)
     val jf2: java.lang.Float = new java.lang.Float((token - 2.0).toString)
