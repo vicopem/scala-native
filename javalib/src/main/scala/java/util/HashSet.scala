@@ -75,7 +75,7 @@ class HashSet[E]
         last.get
       }
 
-      override def remove(): Unit = {
+      def remove(): Unit = {
         if (last.isEmpty) {
           throw new IllegalStateException()
         } else {

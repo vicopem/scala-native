@@ -100,7 +100,7 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
   def put(key: K, value: V): V =
     throw new UnsupportedOperationException()
 
-  override def remove(key: Any): V = {
+  def remove(key: Any): V = {
     @tailrec
     def findAndRemove(iter: Iterator[Map.Entry[K, V]]): V = {
       if (iter.hasNext) {
@@ -134,7 +134,7 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
 
           def next(): K = iter.next().getKey()
 
-          override def remove(): Unit = iter.remove()
+          def remove(): Unit = iter.remove()
         }
       }
     }
@@ -152,7 +152,7 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
 
           def next(): V = iter.next().getValue()
 
-          override def remove(): Unit = iter.remove()
+          def remove(): Unit = iter.remove()
         }
       }
     }

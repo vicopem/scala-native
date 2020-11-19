@@ -471,7 +471,7 @@ object Collections {
             o
           }
 
-          override def remove(): Unit =
+          def remove(): Unit =
             throw new UnsupportedOperationException
         }
       }
@@ -788,7 +788,7 @@ object Collections {
     def next(): E =
       inner.next()
 
-    override def remove(): Unit =
+    def remove(): Unit =
       inner.remove()
   }
 
@@ -1146,7 +1146,7 @@ object Collections {
     def next(): Any =
       throw new NoSuchElementException
 
-    override def remove(): Unit =
+    def remove(): Unit =
       throw new IllegalStateException
   }
 
