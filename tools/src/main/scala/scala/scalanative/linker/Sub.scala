@@ -61,17 +61,16 @@ object Sub {
     }
   }
 
-  def lub(tys: Seq[Type], bound: Type)(implicit linked: linker.Result): Type = {
+  def lub(tys: Seq[Type])(implicit linked: linker.Result): Type = {
     tys match {
       case Seq() =>
         unreachable
       case head +: tail =>
-        tail.foldLeft[Type](head)(lub(_, _, bound))
+        tail.foldLeft[Type](head)(lub)
     }
   }
 
-  def lub(lty: Type, rty: Type, bound: Type)(
-      implicit linked: linker.Result): Type = {
+  def lub(lty: Type, rty: Type)(implicit linked: linker.Result): Type = {
     (lty, rty) match {
       case _ if lty == rty =>
         lty
@@ -90,20 +89,19 @@ object Sub {
       case (lty: Type.RefKind, rty: Type.RefKind) =>
         val ScopeRef(linfo) = lty
         val ScopeRef(rinfo) = rty
-        val ScopeRef(binfo) = bound
-        val lubinfo         = lub(linfo, rinfo, binfo)
+        val lubinfo         = lub(linfo, rinfo)
         val exact =
           lubinfo.name == rinfo.name && rty.isExact &&
             lubinfo.name == linfo.name && lty.isExact
         val nullable =
           lty.isNullable || rty.isNullable
-        Type.Ref(lubinfo.name, exact, nullable)
+        Type.Ref(lub(linfo, rinfo).name, exact, nullable)
       case _ =>
         util.unsupported(s"lub(${lty.show}, ${rty.show})")
     }
   }
 
-  def lub(linfo: ScopeInfo, rinfo: ScopeInfo, boundInfo: ScopeInfo)(
+  def lub(linfo: ScopeInfo, rinfo: ScopeInfo)(
       implicit linked: linker.Result): ScopeInfo = {
     if (linfo == rinfo) {
       linfo
@@ -112,8 +110,7 @@ object Sub {
     } else if (rinfo.is(linfo)) {
       linfo
     } else {
-      val candidates =
-        linfo.linearized.filter(i => rinfo.is(i) && i.is(boundInfo))
+      val candidates = linfo.linearized.filter(i => rinfo.is(i))
 
       candidates match {
         case Seq() =>

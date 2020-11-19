@@ -193,8 +193,7 @@ object Double {
   final val NEGATIVE_INFINITY = 1.0 / -0.0
   final val POSITIVE_INFINITY = 1.0 / 0.0
   final val SIZE              = 64
-  final val TYPE =
-    scala.Predef.classOf[scala.scalanative.runtime.PrimitiveDouble]
+  final val TYPE              = classOf[scala.Double]
 
   @inline def compare(x: scala.Double, y: scala.Double): scala.Int =
     if (x > y) 1

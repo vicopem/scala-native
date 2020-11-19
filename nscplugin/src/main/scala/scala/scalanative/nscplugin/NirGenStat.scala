@@ -20,7 +20,7 @@ trait NirGenStat { self: NirGenPhase =>
     mutable.UnrolledBuffer.empty[ReflectiveInstantiationBuffer]
 
   def isStaticModule(sym: Symbol): Boolean =
-    sym.isModuleClass && !isImplClass(sym) && !sym.isLifted
+    sym.isModuleClass && !sym.isImplClass && !sym.isLifted
 
   class MethodEnv(val fresh: Fresh) {
     private val env = mutable.Map.empty[Symbol, Val]
@@ -80,8 +80,7 @@ trait NirGenStat { self: NirGenPhase =>
 
     def genClass(cd: ClassDef): Unit = {
       scoped(
-        curClassSym := cd.symbol,
-        curClassFresh := nir.Fresh()
+        curClassSym := cd.symbol
       ) {
         if (cd.symbol.isStruct) genStruct(cd)
         else genNormalClass(cd)
@@ -180,7 +179,7 @@ trait NirGenStat { self: NirGenPhase =>
       buf += {
         if (sym.isScalaModule) {
           Defn.Module(attrs, name, parent, traits)
-        } else if (sym.isTraitOrInterface) {
+        } else if (sym.isInterface) {
           Defn.Trait(attrs, name, traits)
         } else {
           Defn.Class(attrs, name, parent, traits)
@@ -217,7 +216,7 @@ trait NirGenStat { self: NirGenPhase =>
     def genClassInterfaces(sym: Symbol) =
       for {
         parent <- sym.info.parents
-        psym = parent.typeSymbol if psym.isTraitOrInterface
+        psym = parent.typeSymbol if psym.isInterface
       } yield {
         genTypeName(psym)
       }
@@ -225,8 +224,7 @@ trait NirGenStat { self: NirGenPhase =>
     def genClassFields(sym: Symbol): Unit = {
       val attrs = nir.Attrs(isExtern = sym.isExternModule)
 
-      for (f <- sym.info.decls
-           if !f.isMethod && f.isTerm && !f.isModule) {
+      for (f <- sym.info.decls if f.isField) {
         val ty   = genType(f.tpe)
         val name = genFieldName(f)
 
@@ -591,7 +589,7 @@ trait NirGenStat { self: NirGenPhase =>
         val attrs    = genMethodAttrs(sym)
         val name     = genMethodName(sym)
         val sig      = genMethodSig(sym)
-        val isStatic = owner.isExternModule || isImplClass(owner)
+        val isStatic = owner.isExternModule || owner.isImplClass
 
         dd.rhs match {
           case EmptyTree =>

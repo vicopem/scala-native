@@ -249,9 +249,9 @@ object CodeGen {
       if (attrs.opt eq Attr.NoOpt) {
         str(" optnone noinline")
       } else {
-        if (attrs.inlineHint ne Attr.MayInline) {
+        if (attrs.inline ne Attr.MayInline) {
           str(" ")
-          genAttr(attrs.inlineHint)
+          genAttr(attrs.inline)
         }
       }
       if (!attrs.isExtern && !isDecl) {
@@ -1008,10 +1008,6 @@ object CodeGen {
     val buf = mutable.UnrolledBuffer.empty[Global]
     buf ++= Lower.depends
     buf ++= Generate.depends
-    buf += Rt.Object.name member Rt.ScalaEqualsSig
-    buf += Rt.Object.name member Rt.ScalaHashCodeSig
-    buf += Rt.Object.name member Rt.JavaEqualsSig
-    buf += Rt.Object.name member Rt.JavaHashCodeSig
     buf
   }
 }

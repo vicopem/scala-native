@@ -1,17 +1,10 @@
 import java.net.{Socket, InetSocketAddress}
-import java.io.{PrintWriter, BufferedReader, InputStreamReader}
+import java.io.{PrintWriter, BufferedReader, InputStreamReader, File}
 import java.nio.file.{Files, Paths}
 
 enablePlugins(ScalaNativePlugin)
 
-scalaVersion := {
-  val scalaVersion = System.getProperty("scala.version")
-  if (scalaVersion == null)
-    throw new RuntimeException(
-      """|The system property 'scala.version' is not defined.
-         |Specify this property using the scriptedLaunchOpts -D.""".stripMargin)
-  else scalaVersion
-}
+scalaVersion := "2.11.12"
 
 lazy val launchClient = taskKey[Unit]("Launching a client for tests")
 
