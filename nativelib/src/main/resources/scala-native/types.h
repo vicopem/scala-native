@@ -1,8 +1,6 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
-// types used in pwd.c and sys/stat.c
-
 typedef unsigned long scalanative_dev_t;
 typedef unsigned int scalanative_mode_t;
 typedef unsigned long long scalanative_ino_t;
