@@ -408,11 +408,6 @@ object IssuesSuite extends tests.Suite {
       assert(data(0).toString == "64")
     }
   }
-
-  test("#1909") {
-    import issue1909._
-    assertNotNull(new RandomWrapper().nextInt())
-  }
 }
 
 package issue1090 {
@@ -447,14 +442,5 @@ package issue1359 {
     def f2[T](a: => T) = ()
 
     def main(args: Array[String]): Unit = f2(f)
-  }
-}
-
-package issue1909 {
-  import java.util.Random
-  class RandomWrapper(impl: Random = new Random()) extends Random {
-    def this(seed: Long) = {
-      this()
-    }
   }
 }
