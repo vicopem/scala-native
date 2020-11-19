@@ -1,11 +1,12 @@
 package java.util
 
+import scala.collection.JavaConverters._
+
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.Assert._
 
 import scala.scalanative.junit.utils.AssertThrows._
-import scala.scalanative.junit.utils.CollectionConverters._
 
 class ArrayDequeTest {
 
@@ -67,7 +68,7 @@ class ArrayDequeTest {
   @Test def constructorCollectionInteger(): Unit = {
     // for AnyVal
     val is = Seq(1, 2, 3)
-    val ad = new ArrayDeque(is.toJavaList)
+    val ad = new ArrayDeque(is.asJava)
     assertTrue("a1", ad.size() == 3)
     assertFalse("a2", ad.isEmpty())
 
@@ -80,7 +81,8 @@ class ArrayDequeTest {
   @Test def constructorCollectionString(): Unit = {
     // for AnyRef
     val is = Seq(1, 2, 3).map(_.toString)
-    val ad = new ArrayDeque(is.toJavaList)
+    import scala.collection.JavaConverters._
+    val ad = new ArrayDeque(is.asJava)
     assertTrue("a1", ad.size() == 3)
     assertFalse("a2", ad.isEmpty())
 
@@ -162,7 +164,7 @@ class ArrayDequeTest {
   }
 
   @Test def clear(): Unit = {
-    val ad1 = new ArrayDeque(Seq(1, 2, 3, 2).toJavaList)
+    val ad1 = new ArrayDeque(Seq(1, 2, 3, 2).asJava)
     ad1.clear()
     assertTrue(ad1.isEmpty())
     // makes sure that clear()ing an already empty list is safe.
@@ -170,7 +172,7 @@ class ArrayDequeTest {
   }
 
   @Test def testClone(): Unit = {
-    val ad1 = new ArrayDeque(Seq(1, 2, 3, 2).toJavaList)
+    val ad1 = new ArrayDeque(Seq(1, 2, 3, 2).asJava)
     val ad2 = ad1.clone()
 
     val element = 1
@@ -187,7 +189,7 @@ class ArrayDequeTest {
   @Test def containsAny(): Unit = {
     val needle = Math.PI
     val is     = Seq(1.1, 2.2, 3.3, needle, 4.0)
-    val ad     = new ArrayDeque(is.toJavaList)
+    val ad     = new ArrayDeque(is.asJava)
 
     val result = ad.contains(needle)
     assertTrue(s"'${ad.toString}' does not contain '${needle}'", result)
@@ -198,9 +200,9 @@ class ArrayDequeTest {
     // ConcurrentModificationException
 
     val is = Seq(1, 2, 3)
-    val ad = new ArrayDeque(is.toJavaList)
+    val ad = new ArrayDeque(is.asJava)
 
-    val result   = ad.descendingIterator.toScalaSeq.toArray
+    val result   = ad.descendingIterator.asScala.toArray
     val expected = is.reverse.toArray
 
     assertTrue(s"element: result} != expected: ${expected})",
@@ -216,7 +218,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.element
 
@@ -241,7 +243,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq("33", "22", "11")
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.getFirst
 
@@ -266,7 +268,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(-33, -22, -11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.getLast
 
@@ -289,9 +291,9 @@ class ArrayDequeTest {
     // ConcurrentModificationException
 
     val is = Seq(-11, 0, 1)
-    val ad = new ArrayDeque(is.toJavaList)
+    val ad = new ArrayDeque(is.asJava)
 
-    val result   = ad.iterator.toScalaSeq.toArray
+    val result   = ad.iterator.asScala.toArray
     val expected = is.toArray
 
     assertTrue(s"element: ${result} != expected: ${expected})",
@@ -381,7 +383,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq("33", "22", "11")
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.peek
 
@@ -407,7 +409,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq("33", "22", "11")
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.peekFirst
 
@@ -433,7 +435,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(-33, -22, -11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.peekLast
 
@@ -459,7 +461,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.poll
 
@@ -485,7 +487,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.pollFirst
 
@@ -510,7 +512,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(-33, -22, -11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.pollLast
 
@@ -535,7 +537,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.pop
 
@@ -584,7 +586,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.remove
 
@@ -603,7 +605,7 @@ class ArrayDequeTest {
   @Test def removeAny(): Unit = {
     val haystack = "Looking for a needle in a haystack"
     val words    = haystack.split(" ").toSeq
-    val ad       = new ArrayDeque(words.toJavaList)
+    val ad       = new ArrayDeque(words.asJava)
 
     locally {
       val adClone    = ad.clone()
@@ -664,7 +666,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(33, 22, 11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.removeFirst
 
@@ -683,7 +685,7 @@ class ArrayDequeTest {
   @Test def removeFirstOccurrenceAny(): Unit = {
     val haystack = "Square needle || round needle || shiny needle"
     val words    = haystack.split(" ").toSeq
-    val ad       = new ArrayDeque(words.toJavaList)
+    val ad       = new ArrayDeque(words.asJava)
 
     locally {
       val adClone    = ad.clone()
@@ -746,7 +748,7 @@ class ArrayDequeTest {
 
     locally {
       val is = Seq(-33, -22, -11)
-      val ad = new ArrayDeque(is.toJavaList)
+      val ad = new ArrayDeque(is.asJava)
 
       val result = ad.removeLast
 
@@ -765,7 +767,7 @@ class ArrayDequeTest {
   @Test def removeLastOccurrenceAny(): Unit = {
     val haystack = "Square needle || round needle || shiny needle"
     val words    = haystack.split(" ").toSeq
-    val ad       = new ArrayDeque(words.toJavaList)
+    val ad       = new ArrayDeque(words.asJava)
 
     locally {
       val adClone    = ad.clone()
@@ -828,14 +830,12 @@ class ArrayDequeTest {
   }
 
   @Test def toArrayNullThrowsNullPointerException(): Unit = {
-    val al1 =
-      new ArrayDeque[String](Seq("apple", "banana", "cherry").toJavaList)
+    val al1 = new ArrayDeque[String](Seq("apple", "banana", "cherry").asJava)
     assertThrows(classOf[NullPointerException], al1.toArray(null))
   }
 
   @Test def toArrayArrayMinusArrayIsShorter(): Unit = {
-    val al1 =
-      new ArrayDeque[String](Seq("apple", "banana", "cherry").toJavaList)
+    val al1  = new ArrayDeque[String](Seq("apple", "banana", "cherry").asJava)
     val ain  = Array.empty[String]
     val aout = al1.toArray(ain)
     assertTrue(ain ne aout)
@@ -843,8 +843,7 @@ class ArrayDequeTest {
   }
 
   @Test def toArrayArrayMinusArrayIsTheSameLengthOrLonger(): Unit = {
-    val al1 =
-      new ArrayDeque[String](Seq("apple", "banana", "cherry").toJavaList)
+    val al1  = new ArrayDeque[String](Seq("apple", "banana", "cherry").asJava)
     val ain  = Array.fill(4)("foo")
     val aout = al1.toArray(ain)
     assertTrue(ain eq aout)
@@ -855,7 +854,7 @@ class ArrayDequeTest {
     class SuperClass
     class SubClass extends SuperClass
     val in   = Seq.fill(2)(new SubClass)
-    val al1  = new ArrayDeque[SubClass](in.toJavaList)
+    val al1  = new ArrayDeque[SubClass](in.asJava)
     val aout = al1.toArray(Array.empty[SuperClass])
     assertTrue(in.toArray sameElements aout)
   }
@@ -873,7 +872,7 @@ class ArrayDequeTest {
 
     locally { // This is the case which is failing on ScalaNative.
       // The difference is that this Deque is not Empty.
-      val ad = new ArrayDeque(Seq(new SubClass).toJavaList)
+      val ad = new ArrayDeque(Seq(new SubClass).asJava)
 
       assertThrows(classOf[ArrayStoreException],
                    ad.toArray(Array.empty[NotSuperClass]))

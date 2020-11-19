@@ -3,7 +3,6 @@ package regex
 
 import java.util
 import java.util.regex.PatternSyntaxException
-import scala.scalanative.junit.utils.CollectionConverters._
 
 import ScalaTestCompat.fail
 
@@ -439,7 +438,8 @@ object ParserSuite extends tests.Suite {
     }
     re.runes = new Array[Int](runes.size)
     var j = 0
-    runes.toScalaSeq.foreach { i =>
+    import scala.collection.JavaConverters._
+    for (i <- runes.asScala) {
       re.runes(j) = i
       j += 1
     }
