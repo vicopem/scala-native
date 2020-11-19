@@ -62,7 +62,6 @@ final class Trait(val attrs: Attrs, val name: Global, val traits: Seq[Trait])
     extends ScopeInfo {
   val implementors = mutable.Set.empty[Class]
   val subtraits    = mutable.Set.empty[Trait]
-  val responds     = mutable.Map.empty[Sig, Global]
 
   def targets(sig: Sig): mutable.Set[Global] = {
     val out = mutable.Set.empty[Global]
@@ -95,11 +94,10 @@ final class Class(val attrs: Attrs,
                   val traits: Seq[Trait],
                   val isModule: Boolean)
     extends ScopeInfo {
-  val implementors    = mutable.Set[Class](this)
-  val subclasses      = mutable.Set.empty[Class]
-  val responds        = mutable.Map.empty[Sig, Global]
-  val defaultResponds = mutable.Map.empty[Sig, Global]
-  var allocated       = false
+  val implementors = mutable.Set[Class](this)
+  val subclasses   = mutable.Set.empty[Class]
+  val responds     = mutable.Map.empty[Sig, Global]
+  var allocated    = false
 
   lazy val fields: Seq[Field] = {
     val out = mutable.UnrolledBuffer.empty[Field]
@@ -143,7 +141,7 @@ final class Class(val attrs: Attrs,
     isModule && (isWhitelisted || attrs.isExtern || (hasEmptyOrNoCtor && hasNoFields))
   }
   def resolve(sig: Sig): Option[Global] = {
-    responds.get(sig).orElse(defaultResponds.get(sig))
+    responds.get(sig)
   }
   def targets(sig: Sig): mutable.Set[Global] = {
     val out = mutable.Set.empty[Global]

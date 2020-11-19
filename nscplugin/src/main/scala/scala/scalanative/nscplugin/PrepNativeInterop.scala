@@ -1,9 +1,11 @@
 package scala.scalanative
 package nscplugin
 
-import scala.collection.mutable.Buffer
 import scala.tools.nsc
-import scala.tools.nsc._
+import nsc._
+
+import scala.collection.immutable.ListMap
+import scala.collection.mutable.Buffer
 
 /**
  * This phase does:
@@ -21,8 +23,9 @@ abstract class PrepNativeInterop
   }
 
   import global._
-  import definitions._
   import nirAddons.nirDefinitions._
+  import definitions._
+  import rootMirror._
 
   val phaseName: String            = "nativeinterop"
   override def description: String = "prepare ASTs for Native interop"
@@ -81,33 +84,6 @@ abstract class PrepNativeInterop
 
     override def transform(tree: Tree): Tree =
       tree match {
-        // Catch calls to Predef.classOf[T]. These should NEVER reach this phase
-        // but unfortunately do. In normal cases, the typer phase replaces these
-        // calls by a literal constant of the given type. However, when we compile
-        // the scala library itself and Predef.scala is in the sources, this does
-        // not happen.
-        //
-        // The trees reach this phase under the form:
-        //
-        //   scala.this.Predef.classOf[T]
-        //
-        // or, as of Scala 2.12.0, as:
-        //
-        //   scala.Predef.classOf[T]
-        //
-        // or so it seems, at least.
-        case TypeApply(classOfTree @ Select(predef, nme.classOf), List(tpeArg))
-            if predef.symbol == PredefModule =>
-          // Replace call by literal constant containing type
-          if (typer.checkClassType(tpeArg)) {
-            val widenedTpe = tpeArg.tpe.dealias.widen
-            println("rewriting class of for" + widenedTpe)
-            typer.typed { Literal(Constant(widenedTpe)) }
-          } else {
-            reporter.error(tpeArg.pos, s"Type ${tpeArg} is not a class type")
-            EmptyTree
-          }
-
         // Catch the definition of scala.Enumeration itself
         case cldef: ClassDef if cldef.symbol == EnumerationClass =>
           enterOwner(OwnerKind.EnumImpl) { super.transform(cldef) }
@@ -133,20 +109,10 @@ abstract class PrepNativeInterop
 
         // `DefDef` that initializes `lazy val scalaProps` in trait `PropertiesTrait`
         // We rewrite the body to return a pre-propulated `Properties`.
-        // - Scala 2.11
-        case dd @ DefDef(mods, name, Nil, Nil, tpt, _)
+        case dd @ DefDef(mods, name, Nil, Nil, tpt, rhs)
             if dd.symbol == PropertiesTrait.info.member(nativenme.scalaProps) =>
-          val nrhs = prepopulatedScalaProperties(dd, unit.freshTermName)
+          val nrhs = prepopulatedScalaProperties(dd, unit.freshTermName _)
           treeCopy.DefDef(tree, mods, name, Nil, Nil, transform(tpt), nrhs)
-
-        // `ValDef` that initializes `lazy val scalaProps` in trait `PropertiesTrait`
-        // We rewrite the body to return a pre-propulated `Properties`.
-        // - Scala 2.12
-        case vddef @ ValDef(mods, name, tpt, _)
-            if vddef.symbol == PropertiesTrait.info.member(
-              nativenme.scalaProps) =>
-          val nrhs = prepopulatedScalaProperties(vddef, unit.freshTermName)
-          treeCopy.ValDef(tree, mods, name, transform(tpt), nrhs)
 
         // Catch ValDefs in enumerations with simple calls to Value
         case ValDef(mods, name, tpt, ScalaEnumValue.NoName(optPar))
@@ -195,8 +161,7 @@ abstract class PrepNativeInterop
           )
           super.transform(tree)
 
-        case _ =>
-          super.transform(tree)
+        case _ => super.transform(tree)
       }
   }
 
@@ -306,7 +271,7 @@ abstract class PrepNativeInterop
    * @return The new (typed) rhs of the given `DefDef`.
    */
   private def prepopulatedScalaProperties(
-      original: ValOrDefDef,
+      original: DefDef,
       freshName: String => TermName): Tree = {
     val libraryFileName = "/library.properties"
 
@@ -342,6 +307,7 @@ abstract class PrepNativeInterop
 
 object PrepNativeInterop {
   private final class OwnerKind(val baseKinds: Int) extends AnyVal {
+    import OwnerKind._
 
     @inline def isBaseKind: Boolean =
       Integer.lowestOneBit(baseKinds) == baseKinds && baseKinds != 0 // exactly 1 bit on

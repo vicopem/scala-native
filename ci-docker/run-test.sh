@@ -10,5 +10,4 @@ docker run -v $HOME/.ivy2:/home/scala-native/.ivy2 \
            -e SCALANATIVE_GC=$SCALANATIVE_GC \
            -e SCALANATIVE_OPTIMIZE=$SCALANATIVE_OPTIMIZE \
            -e TEST_COMMAND=$TEST_COMMAND \
-           -e TRAVIS_SCALA_VERSION=$TRAVIS_SCALA_VERSION \
            -it scala-native-testing:linux-$TARGET_DOCKER_PLATFORM;
