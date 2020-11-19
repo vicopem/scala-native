@@ -11,12 +11,11 @@ import scala.tools.nsc._
  * - Rewrite the body `scala.util.PropertiesTrait.scalaProps` to
  *   be statically determined at compile-time.
  */
-abstract class PrepNativeInterop[G <: Global with Singleton](val global: G)
+abstract class PrepNativeInterop
     extends plugins.PluginComponent
     with transform.Transform {
   import PrepNativeInterop._
 
-  /** Not for use in the constructor body: only initialized afterwards. */
   val nirAddons: NirGlobalAddons {
     val global: PrepNativeInterop.this.global.type
   }
@@ -204,12 +203,14 @@ abstract class PrepNativeInterop[G <: Global with Singleton](val global: G)
   private def isScalaEnum(implDef: ImplDef) =
     implDef.symbol.tpe.typeSymbol isSubClass EnumerationClass
 
-  private abstract class ScalaEnumFctExtractors(val methSym: Symbol) {
+  private trait ScalaEnumFctExtractors {
+    protected val methSym: Symbol
+
     protected def resolve(ptpes: Symbol*) = {
       val res = methSym suchThat {
         _.tpe.params.map(_.tpe.typeSymbol) == ptpes.toList
       }
-      assert(res != NoSymbol, "tried to resolve NoSymbol")
+      assert(res != NoSymbol)
       res
     }
 
@@ -249,18 +250,16 @@ abstract class PrepNativeInterop[G <: Global with Singleton](val global: G)
 
   }
 
-  private object ScalaEnumValue
-      extends ScalaEnumFctExtractors(
-        methSym = getMemberMethod(EnumerationClass, nativenme.Value)
-      )
+  private object ScalaEnumValue extends {
+    protected val methSym = getMemberMethod(EnumerationClass, nativenme.Value)
+  } with ScalaEnumFctExtractors
 
-  private object ScalaEnumVal
-      extends ScalaEnumFctExtractors(
-        methSym = {
-          val valSym = getMemberClass(EnumerationClass, nativenme.Val)
-          valSym.tpe.member(nme.CONSTRUCTOR)
-        }
-      )
+  private object ScalaEnumVal extends {
+    protected val methSym = {
+      val valSym = getMemberClass(EnumerationClass, nativenme.Val)
+      valSym.tpe.member(nme.CONSTRUCTOR)
+    }
+  } with ScalaEnumFctExtractors
 
   /**
    * Construct a call to Enumeration.Value

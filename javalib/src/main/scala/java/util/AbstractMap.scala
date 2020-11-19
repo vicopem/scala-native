@@ -8,19 +8,18 @@ object AbstractMap {
   private def entryEquals[K, V](entry: Map.Entry[K, V], other: Any): Boolean = {
     other match {
       case other: Map.Entry[_, _] =>
-        entry.getKey() === other.getKey() &&
-          entry.getValue() === other.getValue()
+        entry.getKey === other.getKey && entry.getValue === other.getValue
       case _ => false
     }
   }
 
   private def entryHashCode[K, V](entry: Map.Entry[K, V]): Int = {
     val keyHash =
-      if (entry.getKey() == null) 0
-      else entry.getKey().hashCode
+      if (entry.getKey == null) 0
+      else entry.getKey.hashCode
     val valueHash =
-      if (entry.getValue() == null) 0
-      else entry.getValue().hashCode
+      if (entry.getValue == null) 0
+      else entry.getValue.hashCode
 
     keyHash ^ valueHash
   }
@@ -30,7 +29,7 @@ object AbstractMap {
       with Serializable {
 
     def this(entry: Map.Entry[_ <: K, _ <: V]) =
-      this(entry.getKey(), entry.getValue())
+      this(entry.getKey, entry.getValue)
 
     def getKey(): K = key
 
@@ -49,7 +48,7 @@ object AbstractMap {
       entryHashCode(this)
 
     override def toString(): String =
-      "" + getKey() + "=" + getValue()
+      getKey + "=" + getValue
   }
 
   class SimpleImmutableEntry[K, V](key: K, value: V)
@@ -57,7 +56,7 @@ object AbstractMap {
       with Serializable {
 
     def this(entry: Map.Entry[_ <: K, _ <: V]) =
-      this(entry.getKey(), entry.getValue())
+      this(entry.getKey, entry.getValue)
 
     def getKey(): K = key
 
@@ -73,16 +72,16 @@ object AbstractMap {
       entryHashCode(this)
 
     override def toString(): String =
-      "" + getKey() + "=" + getValue()
+      getKey + "=" + getValue
   }
 }
 
 abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
   self =>
 
-  def size(): Int = entrySet().size()
+  def size(): Int = entrySet.size
 
-  def isEmpty(): Boolean = size() == 0
+  def isEmpty(): Boolean = size == 0
 
   def containsValue(value: Any): Boolean =
     entrySet().iterator().scalaOps.exists(value === _.getValue())
@@ -106,17 +105,17 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
   override def remove(key: Any): V = {
     @tailrec
     def findAndRemove(iter: Iterator[Map.Entry[K, V]]): V = {
-      if (iter.hasNext()) {
+      if (iter.hasNext) {
         val item = iter.next()
-        if (key === item.getKey()) {
+        if (key === item.getKey) {
           iter.remove()
-          item.getValue()
+          item.getValue
         } else
           findAndRemove(iter)
       } else
         null.asInstanceOf[V]
     }
-    findAndRemove(entrySet().iterator())
+    findAndRemove(entrySet.iterator)
   }
 
   def putAll(m: Map[_ <: K, _ <: V]): Unit =
@@ -126,15 +125,15 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
       .foreach(e => put(e.getKey(), e.getValue()))
 
   def clear(): Unit =
-    entrySet().clear()
+    entrySet.clear()
 
   def keySet(): Set[K] = {
     new AbstractSet[K] {
-      override def size(): Int = self.size()
+      override def size(): Int = self.size
 
       def iterator(): Iterator[K] = {
         new Iterator[K] {
-          val iter = entrySet().iterator()
+          val iter = entrySet.iterator()
 
           def hasNext(): Boolean = iter.hasNext()
 
@@ -148,11 +147,11 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
 
   def values(): Collection[V] = {
     new AbstractCollection[V] {
-      override def size(): Int = self.size()
+      override def size(): Int = self.size
 
       def iterator(): Iterator[V] = {
         new Iterator[V] {
-          val iter = entrySet().iterator()
+          val iter = entrySet.iterator()
 
           def hasNext(): Boolean = iter.hasNext()
 

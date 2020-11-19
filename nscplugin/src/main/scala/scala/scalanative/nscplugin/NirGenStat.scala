@@ -6,10 +6,9 @@ import scala.reflect.internal.Flags._
 import scala.scalanative.nir._
 import scala.scalanative.util.unsupported
 import scala.scalanative.util.ScopedVar.scoped
-import scala.tools.nsc
 import scalanative.nir.ControlFlow.removeDeadBlocks
 
-trait NirGenStat[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
+trait NirGenStat { self: NirGenPhase =>
 
   import global._
   import definitions._
@@ -70,7 +69,7 @@ trait NirGenStat[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
 
   class StatBuffer {
     private val buf          = mutable.UnrolledBuffer.empty[nir.Defn]
-    def toSeq: Seq[nir.Defn] = buf.toSeq
+    def toSeq: Seq[nir.Defn] = buf
 
     def +=(defn: nir.Defn): Unit = {
       buf += defn

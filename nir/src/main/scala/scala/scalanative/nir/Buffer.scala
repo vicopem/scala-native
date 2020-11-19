@@ -12,7 +12,7 @@ class Buffer(implicit fresh: Fresh) {
   def ++=(other: Buffer): Unit =
     buffer ++= other.buffer
   def toSeq: Seq[Inst] =
-    buffer.toSeq
+    buffer
   def size: Int =
     buffer.size
 

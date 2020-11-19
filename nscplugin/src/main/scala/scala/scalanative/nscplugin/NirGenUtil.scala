@@ -1,9 +1,9 @@
 package scala.scalanative
 package nscplugin
 
-import scala.tools.nsc.Global
+import scalanative.util.unsupported
 
-trait NirGenUtil[G <: Global with Singleton] { self: NirGenPhase[G] =>
+trait NirGenUtil { self: NirGenPhase =>
   import global._
   import definitions._
   import nirAddons._

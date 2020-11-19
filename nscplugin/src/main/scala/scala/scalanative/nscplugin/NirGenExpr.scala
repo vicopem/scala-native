@@ -2,13 +2,12 @@ package scala.scalanative
 package nscplugin
 
 import scala.collection.mutable
-import scala.tools.nsc
-import scalanative.nir._
+import scalanative.nir.{Position, _}
 import scalanative.util.{StringUtils, unsupported}
 import scalanative.util.ScopedVar.scoped
 import scalanative.nscplugin.NirPrimitives._
 
-trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
+trait NirGenExpr { self: NirGenPhase =>
   import global._
   import definitions._
   import treeInfo.hasSynthCaseSymbol
@@ -132,7 +131,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
     }
 
     def genLabelDef(label: LabelDef): Val = {
-      assert(label.params.isEmpty, "empty LabelDef params")
+      assert(label.params.length == 0)
       buf.jump(Next(curMethodEnv.enterLabel(label)))(label.pos)
       genLabel(label)
     }
@@ -210,14 +209,13 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
 
     def genMatch(m: Match): Val = {
       val Match(scrutp, allcaseps) = m
-      type Case = (Local, Val, Tree, nir.Position)
 
       // Extract switch cases and assign unique names to them.
-      val caseps: Seq[Case] = allcaseps.flatMap {
+      val caseps: Seq[(Local, Val, Tree)] = allcaseps.flatMap {
         case CaseDef(Ident(nme.WILDCARD), _, _) =>
           Seq()
-        case cd @ CaseDef(pat, guard, body) =>
-          assert(guard.isEmpty, "CaseDef guard was not empty")
+        case CaseDef(pat, guard, body) =>
+          assert(guard.isEmpty)
           val vals: Seq[Val] = pat match {
             case lit: Literal =>
               List(genLiteralValue(lit))
@@ -228,7 +226,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
             case _ =>
               Nil
           }
-          vals.map((fresh(), _, body, cd.pos: nir.Position))
+          vals.map((fresh(), _, body))
       }
 
       // Extract default case.
@@ -236,63 +234,29 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
         case c @ CaseDef(Ident(nme.WILDCARD), _, body) => body
       }.get
 
-      val retty = genType(m.tpe)
-      val scrut = genExpr(scrutp)
+      // Generate some more fresh names and types.
+      val retty       = genType(m.tpe)
+      val casenexts   = caseps.map { case (n, v, _) => Next.Case(v, n) }
+      val defaultnext = Next(fresh())
+      val merge       = fresh()
+      val mergev      = Val.Local(fresh(), retty)
+
+      implicit val pos: nir.Position = m.pos
 
       // Generate code for the switch and its cases.
-      def genSwitch(): Val = {
-        // Generate some more fresh names and types.
-        val casenexts   = caseps.map { case (n, v, _,_) => Next.Case(v, n) }
-        val defaultnext = Next(fresh())
-        val merge       = fresh()
-        val mergev      = Val.Local(fresh(), retty)
-
-        implicit val pos: nir.Position = m.pos
-
-        // Generate code for the switch and its cases.
-        val scrut = genExpr(scrutp)
-        buf.switch(scrut, defaultnext, casenexts)
-        buf.label(defaultnext.name)(defaultp.pos)
-        buf.jump(merge, Seq(genExpr(defaultp)))(defaultp.pos)
-        caseps.foreach {
-          case (n, _, expr, pos) =>
-            buf.label(n)(pos)
-            val caseres = genExpr(expr)
-            buf.jump(merge, Seq(caseres))(pos)
-        }
-        buf.label(merge, Seq(mergev))
-        mergev
+      val scrut = genExpr(scrutp)
+      buf.switch(scrut, defaultnext, casenexts)
+      buf.label(defaultnext.name)(defaultp.pos)
+      val defaultres = genExpr(defaultp)
+      buf.jump(merge, Seq(defaultres))(defaultp.pos)
+      caseps.foreach {
+        case (n, _, expr) =>
+          buf.label(n)(expr.pos)
+          val caseres = genExpr(expr)
+          buf.jump(merge, Seq(caseres))
       }
-
-      def genIfsChain(): Val = {
-        def loop(cases: List[Case]): Val = {
-          cases match {
-            case (_, caze, body, p) :: elsep =>
-              implicit val pos: nir.Position = p
-
-              val cond =
-                buf.genClassEquality(leftp = ValTree(scrut),
-                                     rightp = ValTree(caze),
-                                     ref = false,
-                                     negated = false)
-              buf.genIf(retty = retty,
-                        condp = ValTree(cond),
-                        thenp = ContTree(() => genExpr(body)),
-                        elsep = ContTree(() => loop(elsep)))
-
-            case Nil => genExpr(defaultp)
-          }
-        }
-        loop(caseps.toList)
-      }
-
-      /* Since 2.13 we need to enforce that only Int switch cases reach backend
-       * For all other cases we're generating If-else chain */
-      val isIntMatch = scrut.ty == Type.Int &&
-        caseps.forall(_._2.ty == Type.Int)
-
-      if (isIntMatch) genSwitch()
-      else genIfsChain()
+      buf.label(merge, Seq(mergev))
+      mergev
     }
 
     def genMatch(prologue: List[Tree], lds: List[LabelDef]): Val = {
@@ -829,7 +793,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
         // and hence `samBridges` will always be empty (scala/bug#10512).
         // Since we only support Scala 2.12.12 and up,
         // we assert that this is not the case.
-        assert(synthCls != NoSymbol, "Unexpected NoSymbol")
+        assert(synthCls != NoSymbol)
         val samBridges = {
           import scala.reflect.internal.Flags.BRIDGE
           synthCls.info.findMembers(excludedFlags = 0L, requiredFlags = BRIDGE).toList
@@ -1564,7 +1528,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
                               _))))))),
             _),
             _) =>
-          val chars = Val.Chars(StringUtils.processEscapes(str).toIndexedSeq)
+          val chars = Val.Chars(StringUtils.processEscapes(str))
           val const = Val.Const(chars)
           buf.box(nir.Rt.BoxedPtr, const, unwind)(app.pos)
 
@@ -1775,7 +1739,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
           }
 
         case Object_synchronized =>
-          assert(argsp.size == 1, "synchronized with wrong number of args")
+          assert(argsp.size == 1)
           genSynchronized(ValTree(boxed), argsp.head)
       }
     }
@@ -1862,7 +1826,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
 
     def genLoadExtern(ty: nir.Type, externTy: nir.Type, sym: Symbol)(
         implicit pos: nir.Position): Val = {
-      assert(sym.owner.isExternModule, "loadExtern was not extern")
+      assert(sym.owner.isExternModule)
 
       val name = Val.Global(genName(sym), Type.Ptr)
 
@@ -1871,7 +1835,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
 
     def genStoreExtern(externTy: nir.Type, sym: Symbol, value: Val)(
         implicit pos: nir.Position): Val = {
-      assert(sym.owner.isExternModule, "storeExtern was not extern")
+      assert(sym.owner.isExternModule)
       val name        = Val.Global(genName(sym), Type.Ptr)
       val externValue = toExtern(externTy, value)
 
@@ -1944,7 +1908,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
       if (!sym.owner.isExternModule) {
         genSimpleArgs(argsp)
       } else {
-        val res = Seq.newBuilder[Val]
+        val res = mutable.UnrolledBuffer.empty[Val]
 
         argsp.zip(sym.tpe.params).foreach {
           case (argp, paramSym) =>
@@ -1952,7 +1916,7 @@ trait NirGenExpr[G <: nsc.Global with Singleton] { self: NirGenPhase[G] =>
             res += toExtern(externType, genExpr(argp))(argp.pos)
         }
 
-        res.result()
+        res
       }
 
     def genSimpleArgs(argsp: Seq[Tree]): Seq[Val] = {

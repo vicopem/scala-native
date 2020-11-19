@@ -1,8 +1,7 @@
 package scala.scalanative
 package nscplugin
-import scala.tools.nsc.Global
 
-trait NirGenType[G <: Global with Singleton] { self: NirGenPhase[G] =>
+trait NirGenType { self: NirGenPhase =>
   import SimpleType.{fromSymbol, fromType}
   import global._
   import definitions._
@@ -158,7 +157,7 @@ trait NirGenType[G <: Global with Singleton] { self: NirGenPhase[G] =>
 
   private def genMethodSigImpl(sym: Symbol,
                                isExtern: Boolean): nir.Type.Function = {
-    require(sym.isMethod || sym.isStaticMember, "symbol is not a method")
+    require(sym.isMethod || sym.isStaticMember)
 
     val tpe      = sym.tpe
     val owner    = sym.owner
