@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets
 
 import scala.annotation.switch
 import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 
 import ScalaOps._
 
@@ -71,25 +72,24 @@ class Properties(protected val defaults: Properties)
   }
 
   private def format(entry: ju.Map.Entry[AnyRef, AnyRef]): String = {
-    def format(s: String): String =
-      if (s.length > 40) s"${s.substring(0, 37)}..." else s
-
-    val key: String   = entry.getKey().asInstanceOf[String]
-    val value: String = entry.getValue().asInstanceOf[String]
-
-    s"${key}=${format(value)}"
+    val key: String   = entry.getKey.asInstanceOf[String]
+    val value: String = entry.getValue.asInstanceOf[String]
+    if (key.length > 40)
+      s"${key.substring(0, 37)}...=$value"
+    else
+      s"$key=$value"
   }
 
   private final val listStr = "-- listing properties --"
 
   def list(out: PrintStream): Unit = {
     out.println(listStr)
-    entrySet().scalaOps.foreach { entry => out.println(format(entry)) }
+    entrySet().asScala.foreach { entry => out.println(format(entry)) }
   }
 
   def list(out: PrintWriter): Unit = {
     out.println(listStr)
-    entrySet().scalaOps.foreach { entry => out.println(format(entry)) }
+    entrySet().asScala.foreach { entry => out.println(format(entry)) }
   }
 
   def store(out: OutputStream, comments: String): Unit = {
@@ -111,24 +111,24 @@ class Properties(protected val defaults: Properties)
     writer.write(new Date().toString)
     writer.write(System.lineSeparator)
 
-    entrySet().scalaOps.foreach { entry =>
+    entrySet().asScala.foreach { entry =>
       writer.write(
-        encodeString(entry.getKey().asInstanceOf[String], isKey = true, toHex))
+        encodeString(entry.getKey.asInstanceOf[String], isKey = true, toHex))
       writer.write('=')
       writer.write(
-        encodeString(entry.getValue().asInstanceOf[String],
-                     isKey = false,
-                     toHex))
+        encodeString(entry.getValue.asInstanceOf[String], isKey = false, toHex))
       writer.write(System.lineSeparator)
     }
     writer.flush()
   }
 
-  @Deprecated
+  @deprecated("", "")
   def save(out: OutputStream, comments: String): Unit =
     store(out, comments)
 
   private def loadImpl(reader: Reader): Unit = {
+    import java.util.regex._
+    val trailingBackspace = Pattern.compile("""(\\)+$""")
     val br                = new BufferedReader(reader)
     val valBuf            = new jl.StringBuilder()
     var prevValueContinue = false
@@ -150,10 +150,18 @@ class Properties(protected val defaults: Properties)
       }
 
       def parseUnicodeEscape(): Char = {
-        val hexStr = line.substring(i, i + 4)
-        // don't advance past the last char used
-        i += 3
-        Integer.parseInt(hexStr, 16).toChar
+        val sb = new jl.StringBuilder()
+        var j  = 0
+        while (j < 4) {
+          sb.append(line.charAt(i))
+          if (j < 3) {
+            // don't advance past the last char used
+            i += 1
+          }
+          j += 1
+        }
+        val ch = Integer.parseInt(sb.toString(), 16).toChar
+        ch
       }
 
       def isWhitespace(char: Char): Boolean =
@@ -172,10 +180,14 @@ class Properties(protected val defaults: Properties)
         line.startsWith("#") || line.startsWith("!")
 
       def oddBackslash(): Boolean = {
-        var i = line.length()
-        while (i > 0 && line.charAt(i - 1) == '\\')
-          i -= 1
-        (line.length() - i) % 2 != 0
+        val m = trailingBackspace.matcher(line)
+        if (m.find()) {
+          val num   = m.end(1) - m.start
+          val isOdd = num % 2 != 0
+          isOdd
+        } else {
+          false
+        }
       }
 
       def valueContinues(): Boolean = oddBackslash()
@@ -280,20 +292,16 @@ class Properties(protected val defaults: Properties)
       val ch = chars(index)
       if (ch <= 0xff) {
         if (ch == '\r' || ch == '\n') {
-          def isCrlf =
-            ch == '\r' && index + 1 < chars.length && chars(index + 1) == '\n'
-
-          if (isCrlf) {
+          // "\r\n"
+          if (ch == '\r'
+              && index + 1 < chars.length
+              && chars(index + 1) == '\n') {
             index += 1
           }
           writer.write(System.lineSeparator)
-
-          def noExplicitComment = {
-            index + 1 < chars.length &&
-            (chars(index + 1) != '#' && chars(index + 1) != '!')
-          }
-
-          if (noExplicitComment) {
+          // add '#' if next char doesn't start with a comment
+          if (index + 1 < chars.length
+              && (chars(index + 1) != '#' && chars(index + 1) != '!')) {
             writer.write('#')
           }
         } else {
