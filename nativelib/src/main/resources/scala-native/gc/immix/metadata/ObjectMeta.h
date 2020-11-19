@@ -57,21 +57,23 @@ static inline void ObjectMeta_ClearBlockAt(ObjectMeta *cursor) {
 static inline void ObjectMeta_SweepLineAt(ObjectMeta *start) {
     //    implements this, just with hardcoded constants:
     //
-    //    size_t startIndex = Bytemap_index(bytemap, start);
-    //    size_t endIndex = startIndex + WORDS_IN_LINE /
-    //    ALLOCATION_ALIGNMENT_WORDS; ObjectMeta *data = bytemap->data;
-    //
-    //    for (size_t i = startIndex; i < endIndex; i++) {
-    //        if (data[i] == om_marked) {
-    //            data[i] = om_allocated;
-    //        } else {
-    //            data[i] = om_free;
-    //        }
-    //    }
-    assert(WORDS_IN_LINE / ALLOCATION_ALIGNMENT_WORDS / 8 == 2);
-    uint64_t *first = (uint64_t *)start;
-    first[0] = (first[0] & SWEEP_MASK) >> 1;
-    first[1] = (first[1] & SWEEP_MASK) >> 1;
+    size_t startIndex = 0;
+    size_t endIndex = startIndex + WORDS_IN_LINE /
+    ALLOCATION_ALIGNMENT_WORDS;
+    ObjectMeta *data = start;
+    
+    for (size_t i = startIndex; i < endIndex; i++) {
+        if (data[i] == om_marked) {
+            data[i] = om_allocated;
+        } else {
+            data[i] = om_free;
+        }
+    }
+//    Trying without hardcoded constants since everything is changing around here.
+//    assert(WORDS_IN_LINE / ALLOCATION_ALIGNMENT_WORDS / 8 == 2);
+//    uintptr_t *first = (uintptr_t *)start;
+//    first[0] = (first[0] & SWEEP_MASK) >> 1;
+//    first[1] = (first[1] & SWEEP_MASK) >> 1;
 }
 
 static inline void ObjectMeta_Sweep(ObjectMeta *cursor) {

@@ -17,7 +17,11 @@
 // Allow read and write
 #define HEAP_MEM_PROT (PROT_READ | PROT_WRITE)
 // Map private anonymous memory, and prevent from reserving swap
+#ifdef P_32_BITS
+#define HEAP_MEM_FLAGS (MAP_NORESERVE | MAP_PRIVATE | MAP_ANONYMOUS | MAP_32BIT)
+#else
 #define HEAP_MEM_FLAGS (MAP_NORESERVE | MAP_PRIVATE | MAP_ANONYMOUS)
+#endif
 // Map anonymous memory (not a file)
 #define HEAP_MEM_FD -1
 #define HEAP_MEM_FD_OFFSET 0
@@ -34,7 +38,7 @@ bool Heap_isGrowingPossible(Heap *heap, uint32_t incrementInBlocks) {
 
 size_t Heap_getMemoryLimit() {
     size_t memorySize = getMemorySize();
-    if ((uint64_t)memorySize > MAX_HEAP_SIZE) {
+    if ((uintptr_t)memorySize > MAX_HEAP_SIZE) {
         return (size_t)MAX_HEAP_SIZE;
     } else {
         return memorySize;
@@ -51,6 +55,10 @@ word_t *Heap_mapAndAlign(size_t memoryLimit, size_t alignmentSize) {
                              HEAP_MEM_FD, HEAP_MEM_FD_OFFSET);
 
     size_t alignmentMask = ~(alignmentSize - 1);
+    if(memoryLimit >= sizeof(word_t)) {
+        printf("Block size : %u\nAlignment : %u\n\n", memoryLimit, alignmentSize);
+        *heapStart = 123456;    // To see if it conflicts
+    }
     // Heap start not aligned on
     if (((word_t)heapStart & alignmentMask) != (word_t)heapStart) {
         word_t *previousBlock = (word_t *)((word_t)heapStart & alignmentMask);

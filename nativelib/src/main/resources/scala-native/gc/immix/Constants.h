@@ -1,15 +1,26 @@
 #ifndef IMMIX_CONSTANTS_H
 #define IMMIX_CONSTANTS_H
 
+#define P_32_BITS 1
+// TODO: 32-bits addon
+#ifdef P_32_BITS
+#define WORD_SIZE_BITS 2
+#else
 #define WORD_SIZE_BITS 3
+#endif
 #define WORD_SIZE (1 << WORD_SIZE_BITS)
 
 #define ALLOCATION_ALIGNMENT_WORDS 2
 #define ALLOCATION_ALIGNMENT (ALLOCATION_ALIGNMENT_WORDS * WORD_SIZE)
 #define ALLOCATION_ALIGNMENT_INVERSE_MASK (~((word_t)ALLOCATION_ALIGNMENT - 1))
 
+// TODO: 32-bits
 #define BLOCK_SIZE_BITS 15
+#ifdef P_32_BITS
+#define LINE_SIZE_BITS 8    // Hardcoded way down deep. Will try keeping it.
+#else
 #define LINE_SIZE_BITS 8
+#endif
 #define BLOCK_COUNT_BITS 24
 
 #define LINE_METADATA_SIZE_BITS 0
@@ -46,8 +57,10 @@
 #define SPACE_USED_PER_BLOCK (BLOCK_TOTAL_SIZE + METADATA_PER_BLOCK)
 #define MAX_HEAP_SIZE ((uint64_t)SPACE_USED_PER_BLOCK * MAX_BLOCK_COUNT)
 
-#define MIN_HEAP_SIZE (1 * 1024 * 1024UL)
+// TODO: 32-bits Check this before committing
+#define MIN_HEAP_SIZE (1 * 1024 * 1024U)
 #define DEFAULT_MIN_HEAP_SIZE (128 * SPACE_USED_PER_BLOCK)
+#define DEFAULT_MAX_HEAP_SIZE (1024 * SPACE_USED_PER_BLOCK)
 #define UNLIMITED_HEAP_SIZE (~((size_t)0))
 
 #define STATS_MEASUREMENTS 100

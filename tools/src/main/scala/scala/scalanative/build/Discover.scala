@@ -16,8 +16,8 @@ object Discover {
   def mode(): Mode =
     getenv("SCALANATIVE_MODE").map(build.Mode(_)).getOrElse(build.Mode.default)
 
-  def optimize(): Boolean =
-    getenv("SCALANATIVE_OPTIMIZE").forall(_.toBoolean)
+  def optimize(): Boolean = false
+    //getenv("SCALANATIVE_OPTIMIZE").forall(_.toBoolean)
 
   /** LTO variant used for release mode from SCALANATIVE_LTO env var or default. */
   def LTO(): LTO =
@@ -51,7 +51,7 @@ object Discover {
           .getOrElse(Seq.empty)
       ("/usr/local/include" +: includedir).map(s => s"-I$s")
     }
-    includes :+ "-Qunused-arguments" :+ m32
+    includes :+ "-Qunused-arguments" :+ "-g" :+ m32 :+ "-rtlib=compiler-rt" :+ "-O0"  /*:+ "-fsanitize=address"*/ :+ "-fsanitize=undefined"
   }
 
   /** Find default options passed to the system's native linker. */
@@ -62,7 +62,7 @@ object Discover {
           .getOrElse(Seq.empty)
       ("/usr/local/lib" +: libdir).map(s => s"-L$s")
     }
-    libs :+ m32
+    libs :+ "-g" :+ m32 :+ "-rtlib=compiler-rt" /*:+ "-fsanitize=address"*/ :+ "-fsanitize=undefined"
   }
 
   /** Detect the target architecture.

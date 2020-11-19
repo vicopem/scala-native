@@ -2,7 +2,7 @@
 #define IMMIX_LOG_H
 
 #ifndef NDEBUG
-#define NDEBUG
+//#define NDEBUG TODO: Remove asserts
 #endif // NDEBUG
 
 #include <assert.h>

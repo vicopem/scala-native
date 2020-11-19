@@ -56,7 +56,7 @@ size_t Settings_MaxHeapSize() {
     if (maxHeapSizeStr != NULL) {
         return Settings_parseSizeStr(maxHeapSizeStr);
     } else {
-        return UNLIMITED_HEAP_SIZE;
+        return DEFAULT_MAX_HEAP_SIZE;
     }
 }
 
