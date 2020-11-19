@@ -1,5 +1,3 @@
-import org.junit.Test
-
-class EmptyPackageTest {
-  @Test def suitesInTheEmptyPackageShouldRun(): Unit = {}
+object EmptyPackageTest extends tests.Suite {
+  test("suites in the empty package should run") {}
 }
