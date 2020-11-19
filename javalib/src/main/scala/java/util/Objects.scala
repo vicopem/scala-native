@@ -1,9 +1,3 @@
-/*
- * Ported from Scala.js
- *   commit SHA1: e07d99d
- *   dated: 2019-07-31
- */
-
 package java.util
 
 import scala.reflect.ClassTag
@@ -11,17 +5,18 @@ import scala.reflect.ClassTag
 object Objects {
 
   @inline
-  def equals(a: Any, b: Any): Boolean =
+  def equals(a: AnyRef, b: AnyRef): Boolean =
     if (a == null) b == null
     else a.equals(b)
 
   @inline
-  def deepEquals(a: Any, b: Any): Boolean = {
-    if (a.asInstanceOf[AnyRef] eq b.asInstanceOf[AnyRef]) true
+  def deepEquals(a: AnyRef, b: AnyRef): Boolean = {
+    if (a eq b) true
     else if (a == null || b == null) false
     else {
       (a, b) match {
-        case (a1: Array[AnyRef], a2: Array[AnyRef])   => Arrays.deepEquals(a1, a2)
+        case (a1: Array[AnyRef], a2: Array[AnyRef]) =>
+          Arrays.deepEquals(a1, a2)
         case (a1: Array[Long], a2: Array[Long])       => Arrays.equals(a1, a2)
         case (a1: Array[Int], a2: Array[Int])         => Arrays.equals(a1, a2)
         case (a1: Array[Short], a2: Array[Short])     => Arrays.equals(a1, a2)
@@ -30,13 +25,13 @@ object Objects {
         case (a1: Array[Boolean], a2: Array[Boolean]) => Arrays.equals(a1, a2)
         case (a1: Array[Float], a2: Array[Float])     => Arrays.equals(a1, a2)
         case (a1: Array[Double], a2: Array[Double])   => Arrays.equals(a1, a2)
-        case _                                        => Objects.equals(a, b)
+        case _                                        => a === b
       }
     }
   }
 
   @inline
-  def hashCode(o: Any): Int =
+  def hashCode(o: AnyRef): Int =
     if (o == null) 0
     else o.hashCode()
 
@@ -45,11 +40,11 @@ object Objects {
     Arrays.hashCode(values)
 
   @inline
-  def toString(o: Any): String =
+  def toString(o: AnyRef): String =
     String.valueOf(o)
 
   @inline
-  def toString(o: Any, nullDefault: String): String =
+  def toString(o: AnyRef, nullDefault: String): String =
     if (o == null) nullDefault
     else o.toString
 
@@ -69,11 +64,11 @@ object Objects {
     else obj
 
   @inline
-  def isNull(obj: Any): Boolean =
+  def isNull(obj: AnyRef): Boolean =
     obj == null
 
   @inline
-  def nonNull(obj: Any): Boolean =
+  def nonNull(obj: AnyRef): Boolean =
     obj != null
 
   // Requires the implementation of java.util.function
