@@ -3,7 +3,7 @@ package java.util
 import java.{util => ju}
 
 import scala.collection.mutable
-import ScalaOps._
+import scala.collection.JavaConverters._
 
 class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
     extends ju.Dictionary[K, V]
@@ -29,10 +29,11 @@ class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
   def isEmpty: Boolean =
     inner.isEmpty
 
-  def keys(): ju.Enumeration[K] = Collections.enumeration(keySet())
+  def keys(): ju.Enumeration[K] =
+    inner.keysIterator.map(_.inner.asInstanceOf[K]).asJavaEnumeration
 
   def elements(): ju.Enumeration[V] =
-    Collections.enumeration(values())
+    inner.valuesIterator.asJavaEnumeration
 
   def contains(value: Any): Boolean =
     containsValue(value)
@@ -70,7 +71,8 @@ class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
   }
 
   def putAll(m: ju.Map[_ <: K, _ <: V]): Unit =
-    m.entrySet().scalaOps.foreach { e => inner.put(Box(e.getKey), e.getValue) }
+    m.asScala.iterator.foreach(kv =>
+      inner.put(Box(kv._1.asInstanceOf[AnyRef]), kv._2))
 
   def clear(): Unit =
     inner.clear()
@@ -83,11 +85,8 @@ class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
       .map(kv => kv._1.inner + "=" + kv._2)
       .mkString("{", ", ", "}")
 
-  def keySet(): ju.Set[K] = {
-    val b = new LinkedHashSet[K]()
-    inner.keySet.foreach { key => b.add(key.inner.asInstanceOf[K]) }
-    b
-  }
+  def keySet(): ju.Set[K] =
+    inner.keySet.map(_.inner.asInstanceOf[K]).asJava
 
   def entrySet(): ju.Set[ju.Map.Entry[K, V]] = {
     class UnboxedEntry(
@@ -102,21 +101,13 @@ class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
       }
       override def hashCode(): Int = boxedEntry.hashCode()
     }
-
-    val entries = new LinkedHashSet[ju.Map.Entry[K, V]]
-    inner.foreach {
-      case (key, value) =>
-        val entry = new UnboxedEntry(
-          new ju.AbstractMap.SimpleEntry[Box[Any], V](key, value)
-        )
-        entries.add(entry)
-    }
-    entries
+    inner.asJava
+      .entrySet()
+      .asScala
+      .map(new UnboxedEntry(_): ju.Map.Entry[K, V])
+      .asJava
   }
 
-  def values(): ju.Collection[V] = {
-    val b = new LinkedList[V]()
-    inner.values.foreach(b.add)
-    b
-  }
+  def values(): ju.Collection[V] =
+    inner.asJava.values
 }

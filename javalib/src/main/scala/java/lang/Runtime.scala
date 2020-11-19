@@ -1,6 +1,7 @@
 package java.lang
 
 import java.io.File
+import scala.collection.JavaConverters._
 import scala.scalanative.annotation.stub
 import scala.scalanative.libc.stdlib
 
@@ -33,11 +34,11 @@ object Runtime {
   private implicit class ProcessBuilderOps(val pb: ProcessBuilder)
       extends AnyVal {
     def setEnv(envp: Array[String]): ProcessBuilder = {
-      val env = pb.environment()
+      val env = pb.environment
       env.clear()
       envp match {
         case null =>
-          env.putAll(System.getenv())
+          System.getenv.asScala.foreach { case (k, v) => env.put(k, v) }
         case a =>
           envp.foreach {
             case null =>

@@ -22,13 +22,10 @@ class ArrayList[E] private (private[this] var inner: Array[Any],
             "Illegal Capacity: " + initialCapacity)
         }
         val initialArr =
-          Array.ofDim[Any](initialCollection.size().max(initialCapacity))
-
-        System.arraycopy(initialCollection.toArray(),
-                         0,
-                         initialArr,
-                         0,
-                         initialCollection.size())
+          Array.ofDim[Any](initialCollection.size() max initialCapacity)
+        import scala.collection.JavaConverters._
+        initialCollection.asScala
+          .copyToArray(initialArr)
         initialArr
       },
       initialCollection.size()
