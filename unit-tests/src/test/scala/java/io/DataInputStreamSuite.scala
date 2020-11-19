@@ -1,15 +1,10 @@
 package java.io
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class DataInputStreamTest {
+object DataInputStreamSuite extends tests.Suite {
 
   // readFully
 
-  @Test def readFullyBufOffLenNullBuffer(): Unit = {
+  test("readFully(b, off, len) - null buffer") {
 
     val inputArray =
       List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(_.toByte).toArray[Byte]
@@ -18,11 +13,12 @@ class DataInputStreamTest {
     val arrayIn = new ByteArrayInputStream(inputArray, 0, iaLength)
     val dis     = new DataInputStream(arrayIn)
 
-    assertThrows(classOf[NullPointerException],
-                 dis.readFully(null.asInstanceOf[Array[Byte]], 0, 1))
+    assertThrows[NullPointerException] {
+      dis.readFully(null.asInstanceOf[Array[Byte]], 0, 1)
+    }
   }
 
-  @Test def readFullyBufOffLenInvalidOffsetArgument(): Unit = {
+  test("readFully(b, off, len) - invalid offset argument") {
 
     val inputArray =
       List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(_.toByte).toArray[Byte]
@@ -32,11 +28,12 @@ class DataInputStreamTest {
     val dis         = new DataInputStream(arrayIn)
     val outputArray = new Array[Byte](iaLength)
 
-    assertThrows(classOf[IndexOutOfBoundsException],
-                 dis.readFully(outputArray, -1, 1))
+    assertThrows[IndexOutOfBoundsException] {
+      dis.readFully(outputArray, -1, 1)
+    }
   }
 
-  @Test def readFullyBufOffLenInvalidLengthArgument(): Unit = {
+  test("readFully(b, off, len) - invalid length argument") {
 
     val inputArray =
       List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(_.toByte).toArray[Byte]
@@ -46,11 +43,12 @@ class DataInputStreamTest {
     val dis         = new DataInputStream(arrayIn)
     val outputArray = new Array[Byte](iaLength)
 
-    assertThrows(classOf[IndexOutOfBoundsException],
-                 dis.readFully(outputArray, 0, -1))
+    assertThrows[IndexOutOfBoundsException] {
+      dis.readFully(outputArray, 0, -1)
+    }
   }
 
-  @Test def readFullyBufOffLenInvalidOffsetPlusLengthArguments(): Unit = {
+  test("readFully(b, off, len) - invalid offset + length arguments") {
 
     val inputArray =
       List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(_.toByte).toArray[Byte]
@@ -60,11 +58,12 @@ class DataInputStreamTest {
     val dis         = new DataInputStream(arrayIn)
     val outputArray = new Array[Byte](iaLength)
 
-    assertThrows(classOf[IndexOutOfBoundsException],
-                 dis.readFully(outputArray, 1, outputArray.length))
+    assertThrows[IndexOutOfBoundsException] {
+      dis.readFully(outputArray, 1, outputArray.length)
+    }
   }
 
-  @Test def readFullyBufOffLenMinusLen0(): Unit = {
+  test("readFully(b, off, len) - len == 0") {
 
     val inputArray = Array.tabulate[Byte](256)(i => i.toByte)
     val iaLength   = inputArray.length
@@ -83,12 +82,12 @@ class DataInputStreamTest {
       val result   = outputArray(index) & 0xFF // want to print 0-255
       val expected = marker & 0xFF
 
-      assertTrue(s"byte at index ${index}: ${result} != expected: ${expected}",
-                 false)
+      assert(false,
+             s"byte at index ${index}: ${result} != expected: ${expected}")
     }
   }
 
-  @Test def readFullyBufOffLenMinusLenEqualsLength(): Unit = {
+  test("readFully(b, off, len) - len == b.length") {
 
     val inputArray = Array.tabulate[Byte](256)(i => i.toByte)
     val iaLength   = inputArray.length
@@ -108,12 +107,12 @@ class DataInputStreamTest {
       val result   = outputArray(index) & 0xFF // want to print 0-255
       val expected = inputArray(index) & 0xFF
 
-      assertTrue(s"byte at index ${index}: ${result} != expected: ${expected}",
-                 false)
+      assert(false,
+             s"byte at index ${index}: ${result} != expected: ${expected}")
     }
   }
 
-  @Test def readFullyBufOffLenPatchMiddleOfBuffer(): Unit = {
+  test("readFully(b, off, len) - patch middle of buffer") {
 
     val inputArray = Array.tabulate[Byte](10)(i => (i + 20).toByte)
     val iaLength   = inputArray.length
@@ -138,12 +137,12 @@ class DataInputStreamTest {
       val result   = outputArray(index) & 0xFF // want to print 0-255
       val expected = inputArray(index) & 0xFF
 
-      assertTrue(s"byte at index ${index}: ${result} != expected: ${expected}",
-                 false)
+      assert(false,
+             s"byte at index ${index}: ${result} != expected: ${expected}")
     }
   }
 
-  @Test def readFullyBufOffLenUnexpectedEndOfFile(): Unit = {
+  test("readFully(b, off, len) - unexpected end of file") {
 
     val inputArray = Array.tabulate[Byte](128)(i => i.toByte)
     val iaLength   = inputArray.length
@@ -153,11 +152,12 @@ class DataInputStreamTest {
 
     val outputArray = Array.fill[Byte](iaLength + 1)(0.toByte)
 
-    assertThrows(classOf[EOFException],
-                 dis.readFully(outputArray, 0, outputArray.length))
+    assertThrows[EOFException] {
+      dis.readFully(outputArray, 0, outputArray.length)
+    }
   }
 
-  @Test def readFullyBufNullBuffer(): Unit = {
+  test("readFully(b) - null buffer") {
 
     val inputArray =
       List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).map(_.toByte).toArray[Byte]
@@ -166,11 +166,12 @@ class DataInputStreamTest {
     val arrayIn = new ByteArrayInputStream(inputArray, 0, iaLength)
     val dis     = new DataInputStream(arrayIn)
 
-    assertThrows(classOf[NullPointerException],
-                 dis.readFully(null.asInstanceOf[Array[Byte]]))
+    assertThrows[NullPointerException] {
+      dis.readFully(null.asInstanceOf[Array[Byte]])
+    }
   }
 
-  @Test def readFullyBuf(): Unit = {
+  test("readFully(b)") {
 
     val inputArray = Array.tabulate[Byte](256)(i => i.toByte).reverse
     val iaLength   = inputArray.length
@@ -189,8 +190,8 @@ class DataInputStreamTest {
       val result   = outputArray(index) & 0xFF // want to print 0-255
       val expected = inputArray(index) & 0xFF
 
-      assertTrue(s"byte at index ${index}: ${result} != expected: ${expected}",
-                 false)
+      assert(false,
+             s"byte at index ${index}: ${result} != expected: ${expected}")
     }
   }
 

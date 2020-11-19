@@ -2,20 +2,17 @@ package java.io
 
 // Ported from Apache Harmony
 
-import org.junit.Test
-import org.junit.Assert._
+object PushbackInputStreamSuite extends tests.Suite {
 
-import scalanative.junit.utils.AssertThrows._
-
-class PushbackInputStreamTest {
-
-  @Test def reset(): Unit = {
+  test("reset()") {
     val pb =
       new PushbackInputStream(new ByteArrayInputStream(Array[Byte](0)), 2)
-    assertThrows(classOf[IOException], pb.reset())
+    assertThrows[IOException] {
+      pb.reset()
+    }
   }
 
-  @Test def mark(): Unit = {
+  test("mark()") {
     val pb =
       new PushbackInputStream(new ByteArrayInputStream(Array[Byte](0)), 2)
     pb.mark(Int.MaxValue)
@@ -24,89 +21,99 @@ class PushbackInputStreamTest {
     pb.mark(Int.MinValue)
   }
 
-  @Test def constructorInputStream(): Unit = {
+  test("Constructor(InputStream)") {
     val str = new PushbackInputStream(null)
-    assertThrows(classOf[IOException], str.read())
+    assertThrows[IOException] {
+      str.read()
+    }
 
     val pis =
       new PushbackInputStream(new ByteArrayInputStream("Hello".getBytes()))
-    assertThrows(classOf[IOException], pis.unread("He".getBytes()))
+    assertThrows[IOException] {
+      pis.unread("He".getBytes())
+    }
   }
 
-  @Test def constructorInputStreamInt(): Unit = {
+  test("Constructor(InputStream, Int)") {
     val pis =
       new PushbackInputStream(new ByteArrayInputStream("Hello".getBytes()))
-    assertThrows(classOf[IOException], pis.unread("Hellos".getBytes()))
+    assertThrows[IOException] {
+      pis.unread("Hellos".getBytes())
+    }
 
     val str = new PushbackInputStream(null, 1)
-    assertThrows(classOf[IOException], str.read())
+    assertThrows[IOException] {
+      str.read()
+    }
   }
 
-  @Test def available(): Unit = {
+  test("available()") {
     val pis = getPIS()
-    assertTrue(pis.available() == fileString.getBytes().length)
+    assert(pis.available() == fileString.getBytes().length)
   }
 
-  @Test def read(): Unit = {
+  test("read()") {
     val pis = getPIS()
-    assertTrue(pis.read() == fileString.getBytes("UTF-8")(0))
+    assert(pis.read() == fileString.getBytes("UTF-8")(0))
   }
 
-  @Test def readArrayByteIntInt(): Unit = {
+  test("read(Array[Byte], Int, Int)") {
     val pis = getPIS()
     val buf = new Array[Byte](100)
     pis.read(buf, 0, buf.length)
-    assertTrue(new String(buf, "UTF-8") == fileString.substring(0, 100))
+    assert(new String(buf, "UTF-8") == fileString.substring(0, 100))
   }
 
-  @Test def skipLong(): Unit = {
+  test("skip(Long)") {
     val pis = getPIS()
 
     val buf = new Array[Byte](50)
     pis.skip(50)
     pis.read(buf, 0, buf.length)
-    assertTrue(new String(buf, "UTF-8") == fileString.substring(50, 100))
+    assert(new String(buf, "UTF-8") == fileString.substring(50, 100))
     pis.unread(buf)
 
     pis.skip(25)
     val buf2 = new Array[Byte](25)
     pis.read(buf2, 0, buf2.length)
-    assertTrue(new String(buf2, "UTF-8") == fileString.substring(75, 100))
+    assert(new String(buf2, "UTF-8") == fileString.substring(75, 100))
   }
 
-  @Test def unreadArrayByte(): Unit = {
+  test("unread(Array[Byte])") {
     val pis = getPIS()
 
     val buf = new Array[Byte](100)
     pis.read(buf, 0, buf.length)
-    assertTrue(new String(buf, "UTF-8") == fileString.substring(0, 100))
+    assert(new String(buf, "UTF-8") == fileString.substring(0, 100))
     pis.unread(buf)
     pis.read(buf, 0, 50)
-    assertTrue(new String(buf, 0, 50, "UTF-8") == fileString.substring(0, 50))
+    assert(new String(buf, 0, 50, "UTF-8") == fileString.substring(0, 50))
   }
 
-  @Test def unreadArrayByteIntInt(): Unit = {
+  test("unread(Array[Byte], Int, Int)") {
     val pis = getPIS()
 
     val buf = new Array[Byte](100)
     pis.read(buf, 0, buf.length)
-    assertTrue(new String(buf, "UTF-8") == fileString.substring(0, 100))
+    assert(new String(buf, "UTF-8") == fileString.substring(0, 100))
     pis.unread(buf, 50, 50)
     pis.read(buf, 0, 50)
-    assertTrue(new String(buf, 0, 50, "UTF-8") == fileString.substring(50, 100))
+    assert(new String(buf, 0, 50, "UTF-8") == fileString.substring(50, 100))
 
     val pb =
       new PushbackInputStream(new ByteArrayInputStream(Array[Byte](0)), 2)
-    assertThrows(classOf[IOException], pb.unread(new Array[Byte](1), 0, 5))
+    assertThrows[IOException] {
+      pb.unread(new Array[Byte](1), 0, 5)
+    }
   }
 
-  @Test def unreadInt(): Unit = {
+  test("unread(Int)") {
     val pis = getPIS()
 
     val x = pis.read()
-    assertTrue(x == fileString.getBytes("UTF-8")(0))
+    assert(x == fileString.getBytes("UTF-8")(0))
     pis.unread(x)
-    assertTrue(pis.read() == x)
+    assert(pis.read() == x)
   }
 
   private def getPIS(): PushbackInputStream =

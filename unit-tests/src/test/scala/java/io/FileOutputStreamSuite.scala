@@ -1,11 +1,6 @@
 package java.io
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class FileOutputStreamTest {
+object FileOutputStreamSuite extends tests.Suite {
   def withTempFile(f: File => Unit): Unit = {
     val tmpfile = File.createTempFile("scala-native-test", null)
     try {
@@ -41,66 +36,77 @@ class FileOutputStreamTest {
     }
   }
 
-  @Test def writeNull(): Unit = {
+  test("write null") {
     withTempFile { file =>
       val fos = new FileOutputStream(file)
-      assertThrows(classOf[NullPointerException], fos.write(null))
-      assertThrows(classOf[NullPointerException], fos.write(null, 0, 0))
+      assertThrows[NullPointerException] {
+        fos.write(null)
+      }
+      assertThrows[NullPointerException] {
+        fos.write(null, 0, 0)
+      }
       fos.close()
     }
   }
 
-  @Test def writeOutOfBoundsNegativeCount(): Unit = {
-    withTempFile { file =>
-      val fos = new FileOutputStream(file)
-      val arr = new Array[Byte](8)
-      assertThrows(classOf[IndexOutOfBoundsException], fos.write(arr, 0, -1))
-      fos.close()
-    }
-  }
-
-  @Test def writeOutOfBoundsNegativeOffset(): Unit = {
+  test("write out of bounds negative count") {
     withTempFile { file =>
       val fos = new FileOutputStream(file)
       val arr = new Array[Byte](8)
-      assertThrows(classOf[IndexOutOfBoundsException], fos.write(arr, -1, 0))
+      assertThrows[IndexOutOfBoundsException] {
+        fos.write(arr, 0, -1)
+      }
       fos.close()
     }
   }
 
-  @Test def writeOutOfBoundsArrayTooSmall(): Unit = {
+  test("write out of bounds negative offset") {
     withTempFile { file =>
       val fos = new FileOutputStream(file)
       val arr = new Array[Byte](8)
-      assertThrows(classOf[IndexOutOfBoundsException], fos.write(arr, 0, 16))
-      assertThrows(classOf[IndexOutOfBoundsException], fos.write(arr, 4, 8))
+      assertThrows[IndexOutOfBoundsException] {
+        fos.write(arr, -1, 0)
+      }
       fos.close()
     }
   }
 
-  @Test def attemptToOpenReadonlyRegularFile(): Unit = {
+  test("write out of bounds array too small") {
+    withTempFile { file =>
+      val fos = new FileOutputStream(file)
+      val arr = new Array[Byte](8)
+      assertThrows[IndexOutOfBoundsException] {
+        fos.write(arr, 0, 16)
+      }
+      assertThrows[IndexOutOfBoundsException] {
+        fos.write(arr, 4, 8)
+      }
+      fos.close()
+    }
+  }
+
+  test("attempt to open a readonly regular file") {
     withTempFile { ro =>
       ro.setReadOnly()
-      assertThrows(classOf[FileNotFoundException], new FileOutputStream(ro))
+      assertThrows[FileNotFoundException](new FileOutputStream(ro))
     }
   }
 
-  @Test def attemptToOpenDirectory(): Unit = {
+  test("attempt to open a directory") {
     withTempDirectory { dir =>
-      assertThrows(classOf[FileNotFoundException], new FileOutputStream(dir))
+      assertThrows[FileNotFoundException](new FileOutputStream(dir))
     }
   }
 
-  @Test def attemptToCreateFileInReadonlyDirectory(): Unit = {
+  test("attempt to create a file in a readonly directory") {
     withTempDirectory { ro =>
       ro.setReadOnly()
-      assertThrows(classOf[FileNotFoundException],
-                   new FileOutputStream(new File(ro, "child")))
+      assertThrows[FileNotFoundException](
+        new FileOutputStream(new File(ro, "child")))
     }
-
   }
 
-  @Test def truncateFileOnInitializationIfAppendFalse(): Unit = {
+  test("truncate a file on initialization if append=false") {
     val nonEmpty = File.createTempFile("scala-native-unit-test", null)
     try {
       // prepares a non-empty file
@@ -131,7 +137,7 @@ class FileOutputStreamTest {
     }
   }
 
-  @Test def doNotTruncateFileOnInitializationIfAppendTrue(): Unit = {
+  test("do not truncate a file on initialization if append=true") {
     val nonEmpty = File.createTempFile("scala-native-unit-test", null)
     try {
       val written = 0x20

@@ -9,7 +9,7 @@ class BiConsumerTest {
   var result = 0
 
   @Before
-  def setUp(): Unit = {
+  protected def setUp(): Unit = {
     result = 0
   }
 
