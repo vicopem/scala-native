@@ -1,5 +1,7 @@
 package java.net
 
+import java.io.IOException
+
 object SocketSuite extends tests.Suite {
 
   test("keepAlive") {

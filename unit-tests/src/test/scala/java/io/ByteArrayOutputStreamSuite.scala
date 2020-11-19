@@ -1,5 +1,7 @@
 package java.io
 
+import java.nio.charset._
+
 object ByteArrayOutputStreamSuite extends tests.Suite {
 
   test("toString(String) with unsupported encoding") {
