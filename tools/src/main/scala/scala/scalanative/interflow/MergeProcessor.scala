@@ -30,16 +30,13 @@ final class MergeProcessor(insts: Array[Inst],
   }
 
   def merge(block: MergeBlock)(
-      implicit linked: linker.Result): (Seq[MergePhi], State) = {
-    import block.cfPos
+      implicit linked: linker.Result): (Seq[MergePhi], State) =
     merge(block.name, block.label.params, block.incoming.toSeq.sortBy(_._1.id))
-  }
 
   def merge(merge: Local,
             params: Seq[Val.Local],
             incoming: Seq[(Local, (Seq[Val], State))])(
-      implicit linked: linker.Result,
-      origDefPos: Position): (Seq[MergePhi], State) = {
+      implicit linked: linker.Result): (Seq[MergePhi], State) = {
     val names  = incoming.map { case (n, (_, _)) => n }
     val states = incoming.map { case (_, (_, s)) => s }
 
@@ -383,7 +380,7 @@ final class MergeProcessor(insts: Array[Inst],
     }
   }
 
-  def toSeq()(implicit originDefnPos: nir.Position): Seq[MergeBlock] = {
+  def toSeq: Seq[MergeBlock] = {
     val sortedBlocks = blocks.values.toSeq
       .filter(_.cf != null)
       .sortBy { block => offsets(block.label.name) }
@@ -424,8 +421,7 @@ final class MergeProcessor(insts: Array[Inst],
       // to the source instructions, not relative to generated ones.
       val syntheticFresh = Fresh(insts)
       val syntheticParam = Val.Local(syntheticFresh(), retTy)
-      val syntheticLabel =
-        Inst.Label(syntheticFresh(), Seq(syntheticParam))
+      val syntheticLabel = Inst.Label(syntheticFresh(), Seq(syntheticParam))
       val resultMergeBlock =
         new MergeBlock(syntheticLabel, Local(blockFresh().id * 10000))
       blocks(syntheticLabel.name) = resultMergeBlock
@@ -448,8 +444,7 @@ final class MergeProcessor(insts: Array[Inst],
       resultMergeBlock.phis = phis
       resultMergeBlock.start = state
       resultMergeBlock.end = state
-      resultMergeBlock.cf =
-        Inst.Ret(eval.eval(syntheticParam)(state, originDefnPos))
+      resultMergeBlock.cf = Inst.Ret(eval.eval(syntheticParam)(state))
     }
 
     orderedBlocks ++= sortedBlocks.filter(isExceptional)

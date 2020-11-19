@@ -113,9 +113,7 @@ object CodeGen {
       if (!generated.contains(mn)) {
         newline()
         genDefn {
-          val defn             = env(n)
-          implicit val rootPos = defn.pos
-          defn match {
+          env(n) match {
             case defn @ Defn.Var(attrs, _, _, _) =>
               defn.copy(attrs.copy(isExtern = true))
             case defn @ Defn.Const(attrs, _, ty, _) =>
@@ -403,16 +401,14 @@ object CodeGen {
     def genBlockLandingPads(block: Block)(implicit cfg: CFG,
                                           fresh: Fresh): Unit = {
       block.insts.foreach {
-        case inst @ Inst.Let(_, _, unwind: Next.Unwind) =>
-          import inst.pos
+        case Inst.Let(_, _, unwind: Next.Unwind) =>
           genLandingPad(unwind)
         case _ =>
           ()
       }
     }
 
-    def genLandingPad(unwind: Next.Unwind)(implicit fresh: Fresh,
-                                           pos: nir.Position): Unit = {
+    def genLandingPad(unwind: Next.Unwind)(implicit fresh: Fresh): Unit = {
       val Next.Unwind(Val.Local(excname, _), next) = unwind
 
       val excpad  = "_" + excname.id + ".landingpad"
@@ -618,7 +614,7 @@ object CodeGen {
                    elseNext @ Next.Label(elseName, elseArgs))
           if thenName == elseName =>
         if (thenArgs == elseArgs) {
-          genInst(Inst.Jump(thenNext)(inst.pos))
+          genInst(Inst.Jump(thenNext))
         } else {
           val args = thenArgs.zip(elseArgs).map {
             case (thenV, elseV) =>
@@ -634,7 +630,7 @@ object CodeGen {
               genVal(elseV)
               Val.Local(name, thenV.ty)
           }
-          genInst(Inst.Jump(Next.Label(thenName, args))(inst.pos))
+          genInst(Inst.Jump(Next.Label(thenName, args)))
         }
 
       case Inst.If(cond, thenp, elsep) =>

@@ -17,7 +17,7 @@ object ControlFlow {
   final case class Block(name: Local,
                          params: Seq[Val.Local],
                          insts: Seq[Inst],
-                         isEntry: Boolean)(implicit val pos: Position) {
+                         isEntry: Boolean) {
     val inEdges  = mutable.UnrolledBuffer.empty[Edge]
     val outEdges = mutable.UnrolledBuffer.empty[Edge]
 
@@ -72,7 +72,7 @@ object ControlFlow {
         to.inEdges += e
       }
 
-      def block(local: Local)(implicit pos: Position): Block =
+      def block(local: Local): Block =
         blocks.getOrElse(
           local, {
             val k                     = locations(local)
@@ -97,13 +97,11 @@ object ControlFlow {
       def visit(node: Block): Unit = {
         val insts :+ cf = node.insts
         insts.foreach {
-          case inst @ Inst.Let(_, op, unwind) if unwind ne Next.None =>
-            edge(node, block(unwind.name)(inst.pos), unwind)
+          case Inst.Let(_, op, unwind) if unwind ne Next.None =>
+            edge(node, block(unwind.name), unwind)
           case _ =>
             ()
         }
-        implicit val pos: Position = cf.pos
-
         cf match {
           case _: Inst.Ret =>
             ()
@@ -128,9 +126,8 @@ object ControlFlow {
         }
       }
 
-      val entryInst = insts.head.asInstanceOf[Inst.Label]
-      val entry     = block(entryInst.name)(entryInst.pos)
-      val visited   = mutable.Set.empty[Local]
+      val entry   = block(insts.head.asInstanceOf[Inst.Label].name)
+      val visited = mutable.Set.empty[Local]
 
       while (todo.nonEmpty) {
         val block = todo.head

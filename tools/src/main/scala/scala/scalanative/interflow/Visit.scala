@@ -131,8 +131,7 @@ trait Visit { self: Interflow =>
         case BailOut(msg) =>
           log(s"failed to expand ${name.show}: $msg")
           val baildefn =
-            origdefn.copy(attrs = origdefn.attrs.copy(opt = Attr.BailOpt(msg)))(
-              origdefn.pos)
+            origdefn.copy(attrs = origdefn.attrs.copy(opt = Attr.BailOpt(msg)))
           noOpt(origdefn)
           setDone(name, baildefn)
           setDone(origname, baildefn)
