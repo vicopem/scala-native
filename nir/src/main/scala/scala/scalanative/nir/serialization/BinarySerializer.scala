@@ -3,32 +3,18 @@ package nir
 package serialization
 
 import java.net.URI
-import java.io.{DataOutputStream, OutputStream}
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import scala.collection.mutable
 import scala.scalanative.nir.serialization.{Tags => T}
 
-final class BinarySerializer {
-  private[this] val bufferUnderyling = new JumpBackByteArrayOutputStream
-  private[this] val buffer           = new DataOutputStream(bufferUnderyling)
+final class BinarySerializer(buffer: ByteBuffer) {
+  import buffer._
 
   private[this] var lastPosition: Position = Position.NoPosition
   private[this] val fileIndexMap           = mutable.ListMap.empty[URI, Int]
 
-  // Methods were renamed in order to not pollute git blame history.
-  // Original implementation used ByteBuffers
-  import buffer.{
-    write => put,
-    writeDouble => putDouble,
-    writeFloat => putFloat,
-    writeInt => putInt,
-    writeChar => putChar,
-    writeLong => putLong,
-    writeShort => putShort
-  }
-  import bufferUnderyling.currentPosition
-
-  def serialize(defns: Seq[Defn], outputStream: OutputStream): Unit = {
+  final def serialize(defns: Seq[Defn]): Unit = {
     val names     = defns.map(_.name)
     val filenames = initFiles(defns)
     val positions = mutable.UnrolledBuffer.empty[Int]
@@ -43,23 +29,23 @@ final class BinarySerializer {
 
     putSeq(names) { n =>
       putGlobal(n)
-      positions += currentPosition()
+      positions += buffer.position()
       putInt(0)
     }
 
-    defns
-      .zip(positions)
-      .foreach {
-        case (defn, marker) =>
-          val offset: Int = currentPosition()
-          bufferUnderyling.jumpTo(marker)
-          putInt(offset)
-          bufferUnderyling.continue()
-          putDefn(defn)
-      }
+    val offsets = defns.map { defn =>
+      val pos: Int = buffer.position()
+      putDefn(defn)
+      pos
+    }
+    val end = buffer.position()
 
-    buffer.flush()
-    bufferUnderyling.writeTo(outputStream)
+    positions.zip(offsets).map {
+      case (pos, offset) =>
+        buffer.position(pos)
+        putInt(offset)
+    }
+    buffer.position(end)
   }
 
   private def putSeq[T](seq: Seq[T])(putT: T => Unit) = {
@@ -72,7 +58,7 @@ final class BinarySerializer {
     case Some(t) => put(1.toByte); putT(t)
   }
 
-  private def putInts(ints: Seq[Int]) = putSeq[Int](ints)(putInt)
+  private def putInts(ints: Seq[Int]) = putSeq[Int](ints)(putInt(_))
 
   private def putUTF8tring(v: String) = putBytes {
     v.getBytes(StandardCharsets.UTF_8)
@@ -518,7 +504,7 @@ final class BinarySerializer {
     case Val.String(v) =>
       putInt(T.StringVal)
       putInt(v.length)
-      v.foreach(putChar(_))
+      v.foreach(putChar)
     case Val.Virtual(v) => putInt(T.VirtualVal); putLong(v)
   }
 
