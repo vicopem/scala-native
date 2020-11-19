@@ -1,6 +1,5 @@
 package scala.scalanative
 package nir
-import scala.scalanative.nir.Sig.Scope.{Private, Public}
 
 object Mangle {
   def apply(ty: Type): String = {
@@ -44,16 +43,10 @@ object Mangle {
     def mangleSig(sig: Sig): Unit =
       str(sig.mangle)
 
-    def mangleSigScope(scope: Sig.Scope): Unit = scope match {
-      case Public      => str("O")
-      case Private(in) => str("P"); mangleGlobal(in)
-    }
-
     def mangleUnmangledSig(sig: Sig.Unmangled): Unit = sig match {
-      case Sig.Field(id, scope) =>
+      case Sig.Field(id) =>
         str("F")
         mangleIdent(id)
-        mangleSigScope(scope)
       case Sig.Ctor(types) =>
         str("R")
         types.foreach(mangleType)
@@ -61,12 +54,11 @@ object Mangle {
       case Sig.Clinit() =>
         str("I")
         str("E")
-      case Sig.Method(id, types, scope) =>
+      case Sig.Method(id, types) =>
         str("D")
         mangleIdent(id)
         types.foreach(mangleType)
         str("E")
-        mangleSigScope(scope)
       case Sig.Proxy(id, types) =>
         str("P")
         mangleIdent(id)

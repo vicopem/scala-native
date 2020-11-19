@@ -19,20 +19,15 @@ object Unmangle {
         error(s"expected global, but got $ch")
     }
 
-    def readSigScope(): Sig.Scope = read() match {
-      case 'O' => Sig.Scope.Public
-      case 'P' => Sig.Scope.Private(readGlobal())
-    }
-
     def readUnmangledSig(): Sig.Unmangled = read() match {
       case 'F' =>
-        Sig.Field(readIdent(), readSigScope())
+        Sig.Field(readIdent())
       case 'R' =>
         Sig.Ctor(readTypes())
       case 'I' =>
         Sig.Clinit()
       case 'D' =>
-        Sig.Method(readIdent(), readTypes(), readSigScope())
+        Sig.Method(readIdent(), readTypes())
       case 'P' =>
         Sig.Proxy(readIdent(), readTypes())
       case 'C' =>
