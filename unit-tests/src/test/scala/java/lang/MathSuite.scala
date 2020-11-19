@@ -1,116 +1,111 @@
 package java.lang
 
-import org.junit.Test
-import org.junit.Assert._
-
-class MathTest {
+object MathSuite extends tests.Suite {
 
   // Max()
 
-  @Test def maxWithNanArguments(): Unit = {
+  test("max with NaN arguments") {
     val a = 123.123d
     val b = 456.456d
 
-    assertTrue("Double.NaN as first argument", Math.max(Double.NaN, b).isNaN)
-    assertTrue("Double.NaN as second argument", Math.max(a, Double.NaN).isNaN)
+    assert(Math.max(Double.NaN, b).isNaN, "Double.NaN as first argument")
+    assert(Math.max(a, Double.NaN).isNaN, "Double.NaN as second argument")
 
-    assertTrue("Float.NaN as first argument",
-               Math.max(Float.NaN, b.toFloat).isNaN)
-    assertTrue("Float.NaN as second argument", Math.max(a, Float.NaN).isNaN)
+    assert(Math.max(Float.NaN, b.toFloat).isNaN, "Float.NaN as first argument")
+    assert(Math.max(a, Float.NaN).isNaN, "Float.NaN as second argument")
   }
 
-  @Test def maxAlphaGreaterThanBeta(): Unit = {
+  test("max a > b") {
     val a = 578.910d
     val b = 456.456d
-    assertTrue("Double", Math.max(a, b) == a)
-    assertTrue("Float", Math.max(a.toFloat, b.toFloat) == a.toFloat)
-    assertTrue("Int", Math.max(a.toInt, b.toInt) == a.toInt)
-    assertTrue("Long", Math.max(a.toLong, b.toLong) == a.toLong)
+    assert(Math.max(a, b) == a, "Double")
+    assert(Math.max(a.toFloat, b.toFloat) == a.toFloat, "Float")
+    assert(Math.max(a.toInt, b.toInt) == a.toInt, "Int")
+    assert(Math.max(a.toLong, b.toLong) == a.toLong, "Long")
   }
 
-  @Test def maxAlphaEqualEqualBeta(): Unit = {
+  test("max a == b") {
     val a = 576528
     val b = a
-    assertTrue("Double", Math.max(a, b) == a)
-    assertTrue("Float", Math.max(a.toFloat, b.toFloat) == a.toFloat)
-    assertTrue("Int", Math.max(a.toInt, b.toInt) == a.toInt)
-    assertTrue("Long", Math.max(a.toLong, b.toLong) == a.toLong)
+    assert(Math.max(a, b) == a, "Double")
+    assert(Math.max(a.toFloat, b.toFloat) == a.toFloat, "Float")
+    assert(Math.max(a.toInt, b.toInt) == a.toInt, "Int")
+    assert(Math.max(a.toLong, b.toLong) == a.toLong, "Long")
   }
 
-  @Test def maxAlphaLessThanBeta(): Unit = {
+  test("max a < b") {
     val a = 123.123d
     val b = 456.456d
-    assertTrue("Double", Math.max(a, b) == b)
-    assertTrue("Float", Math.max(a.toFloat, b.toFloat) == b.toFloat)
-    assertTrue("Int", Math.max(a.toInt, b.toInt) == b.toInt)
-    assertTrue("Long", Math.max(a.toLong, b.toLong) == b.toLong)
+    assert(Math.max(a, b) == b, "Double")
+    assert(Math.max(a.toFloat, b.toFloat) == b.toFloat, "Float")
+    assert(Math.max(a.toInt, b.toInt) == b.toInt, "Int")
+    assert(Math.max(a.toLong, b.toLong) == b.toLong, "Long")
   }
 
   // Min()
 
-  @Test def minWithNanArguments(): Unit = {
+  test("min with NaN arguments") {
     val a = 773.211d
     val b = 843.531d
 
-    assertTrue("Double.NaN as first argument", Math.max(Double.NaN, b).isNaN)
-    assertTrue("Double.NaN as second argument", Math.max(a, Double.NaN).isNaN)
+    assert(Math.max(Double.NaN, b).isNaN, "Double.NaN as first argument")
+    assert(Math.max(a, Double.NaN).isNaN, "Double.NaN as second argument")
 
-    assertTrue("Float.NaN as first argument",
-               Math.max(Float.NaN, b.toFloat).isNaN)
-    assertTrue("Float.NaN as second argument", Math.max(a, Float.NaN).isNaN)
+    assert(Math.max(Float.NaN, b.toFloat).isNaN, "Float.NaN as first argument")
+    assert(Math.max(a, Float.NaN).isNaN, "Float.NaN as second argument")
   }
 
-  @Test def minAlphaGreaterThanBeta(): Unit = {
+  test("min a > b") {
     val a = 949.538d
     val b = 233.411d
-    assertTrue("Double", Math.min(a, b) == b)
-    assertTrue("Float", Math.min(a.toFloat, b.toFloat) == b.toFloat)
-    assertTrue("Int", Math.min(a.toInt, b.toInt) == b.toInt)
-    assertTrue("Long", Math.min(a.toLong, b.toLong) == b.toLong)
+    assert(Math.min(a, b) == b, "Double")
+    assert(Math.min(a.toFloat, b.toFloat) == b.toFloat, "Float")
+    assert(Math.min(a.toInt, b.toInt) == b.toInt, "Int")
+    assert(Math.min(a.toLong, b.toLong) == b.toLong, "Long")
   }
 
-  @Test def minAlphaEqualEqualBeta(): Unit = {
+  test("min a == b") {
     val a = 553.838d
     val b = a
-    assertTrue("Double", Math.min(a, b) == b)
-    assertTrue("Float", Math.min(a.toFloat, b.toFloat) == b.toFloat)
-    assertTrue("Int", Math.min(a.toInt, b.toInt) == b.toInt)
-    assertTrue("Long", Math.min(a.toLong, b.toLong) == b.toLong)
+    assert(Math.min(a, b) == b, "Double")
+    assert(Math.min(a.toFloat, b.toFloat) == b.toFloat, "Float")
+    assert(Math.min(a.toInt, b.toInt) == b.toInt, "Int")
+    assert(Math.min(a.toLong, b.toLong) == b.toLong, "Long")
   }
 
-  @Test def minAlphaLessThanBeta(): Unit = {
+  test("min a < b") {
     val a = 312.966d
     val b = 645.521d
-    assertTrue("Double", Math.min(a, b) == a)
-    assertTrue("Float", Math.min(a.toFloat, b.toFloat) == a.toFloat)
-    assertTrue("Int", Math.min(a.toInt, b.toInt) == a.toInt)
-    assertTrue("Long", Math.min(a.toLong, b.toLong) == a.toLong)
+    assert(Math.min(a, b) == a, "Double")
+    assert(Math.min(a.toFloat, b.toFloat) == a.toFloat, "Float")
+    assert(Math.min(a.toInt, b.toInt) == a.toInt, "Int")
+    assert(Math.min(a.toLong, b.toLong) == a.toLong, "Long")
   }
 
   // round()
 
-  @Test def roundDoubleSpecialValues(): Unit = {
+  test("round(Double) - special values") {
 
-    assertTrue("round(NaN) != 0L", Math.round(Double.NaN) == 0L)
+    assert(Math.round(Double.NaN) == 0L, "round(NaN) != 0L")
 
     // value d as reported in issue #1071
     val dTooLarge: Double      = 4228438087383875356545203991520.000000d
     val roundedTooLarge: Long  = Math.round(dTooLarge)
     val expectedTooLarge: Long = scala.Long.MaxValue
 
-    assertTrue(s"${roundedTooLarge} != ${expectedTooLarge}" +
-                 " when Double > Long.MaxValue",
-               roundedTooLarge == expectedTooLarge)
+    assert(roundedTooLarge == expectedTooLarge,
+           s"${roundedTooLarge} != ${expectedTooLarge}" +
+             " when Double > Long.MaxValue")
 
     val roundedTooNegative: Long  = Math.round(-1.0 * dTooLarge)
     val expectedTooNegative: Long = scala.Long.MinValue
 
-    assertTrue(s"${roundedTooNegative} != ${expectedTooNegative}" +
-                 " when Double < Long.MinValue",
-               roundedTooNegative == expectedTooNegative)
+    assert(roundedTooNegative == expectedTooNegative,
+           s"${roundedTooNegative} != ${expectedTooNegative}" +
+             " when Double < Long.MinValue")
   }
 
-  @Test def roundDoubleTiesRoundingTowardsPlusInfinity(): Unit = {
+  test("round(Double) - ties rounding towards +Infinity") {
 
     case class TestPoint(value: Double, expected: Long)
 
@@ -169,33 +164,33 @@ class MathTest {
         val result: Long   = math.round(v)
         val expected: Long = testPoint.expected
 
-        assertTrue(s"round(${v}) result: ${result} != expected: ${expected}",
-                   result == testPoint.expected)
+        assert(result == testPoint.expected,
+               s"round(${v}) result: ${result} != expected: ${expected}")
       }
     }
   }
 
-  @Test def roundFloatSpecialValues(): Unit = {
+  test("round(Float) - special values") {
 
-    assertTrue("round(NaN) != 0", Math.round(Float.NaN) == 0)
+    assert(Math.round(Float.NaN) == 0, "round(NaN) != 0")
 
     val fTooLarge: Float      = scala.Float.MaxValue
     val roundedTooLarge: Int  = Math.round(fTooLarge)
     val expectedTooLarge: Int = scala.Int.MaxValue
 
-    assertTrue(s"${roundedTooLarge} != ${expectedTooLarge}" +
-                 " when Float > Int.MaxValue",
-               roundedTooLarge == expectedTooLarge)
+    assert(roundedTooLarge == expectedTooLarge,
+           s"${roundedTooLarge} != ${expectedTooLarge}" +
+             " when Float > Int.MaxValue")
 
     val roundedTooNegative: Int  = Math.round(scala.Float.MinValue)
     val expectedTooNegative: Int = scala.Int.MinValue
 
-    assertTrue(s"${roundedTooNegative} != ${expectedTooNegative}" +
-                 " when Float < Int.MinValue",
-               roundedTooNegative == expectedTooNegative)
+    assert(roundedTooNegative == expectedTooNegative,
+           s"${roundedTooNegative} != ${expectedTooNegative}" +
+             " when Float < Int.MinValue")
   }
 
-  @Test def roundFloatTiesRoundingTowardsPlusInfinity(): Unit = {
+  test("round(Float) - ties rounding towards +Infinity") {
 
     case class TestPoint(value: Float, expected: Int)
 
@@ -251,8 +246,8 @@ class MathTest {
         val result: Int   = math.round(v)
         val expected: Int = testPoint.expected
 
-        assertTrue(s"round(${v}) result: ${result} != expected: ${expected}",
-                   result == testPoint.expected)
+        assert(result == testPoint.expected,
+               s"round(${v}) result: ${result} != expected: ${expected}")
       }
     }
   }

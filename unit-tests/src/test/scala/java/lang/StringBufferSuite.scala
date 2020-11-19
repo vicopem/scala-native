@@ -2,12 +2,7 @@ package java.lang
 
 // Ported from Scala.js
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class StringBufferTest {
+object StringBufferSuite extends tests.Suite {
 
   def newBuf: java.lang.StringBuffer =
     new java.lang.StringBuffer
@@ -15,7 +10,7 @@ class StringBufferTest {
   def initBuf(str: String): java.lang.StringBuffer =
     new java.lang.StringBuffer(str)
 
-  @Test def append(): Unit = {
+  test("append") {
     assertEquals("asdf", newBuf.append("asdf").toString)
     assertEquals("null", newBuf.append(null: AnyRef).toString)
     assertEquals("null", newBuf.append(null: String).toString)
@@ -29,12 +24,12 @@ class StringBufferTest {
     assertEquals("100000", newBuf.append(100000).toString)
   }
 
-  @Test def appendFloat(): Unit = {
+  test("append float") {
     assertEquals("2.5", newBuf.append(2.5f).toString)
     assertEquals("3.5", newBuf.append(3.5).toString)
   }
 
-  @Test def insert(): Unit = {
+  test("insert") {
     assertEquals("asdf", newBuf.insert(0, "asdf").toString)
     assertEquals("null", newBuf.insert(0, null: AnyRef).toString)
     assertEquals("null", newBuf.insert(0, null: String).toString)
@@ -62,18 +57,17 @@ class StringBufferTest {
                  initBuf("abcd").insert(5, "whatever"))
   }
 
-  @Test def insertFloat(): Unit = {
+  test("insert float") {
     assertEquals("2.5", newBuf.insert(0, 2.5f).toString)
     assertEquals("3.5", newBuf.insert(0, 3.5).toString)
   }
 
   // TODO: segfaults with EXC_BAD_ACCESS (code=1, address=0x0)
-  @Test def insertStringBuffer(): Unit = {
-    assertEquals("abcdef",
-                 initBuf("abef").insert(2, initBuf("abcde"), 2, 4).toString)
-  }
+  // testFails("insert string buffer", issue = -1) {
+  //   assertEquals("abcdef", initBuf("abef").insert(2, initBuf("abcde"), 2, 4).toString)
+  // }
 
-  @Test def deleteCharAt(): Unit = {
+  test("deleteCharAt") {
     assertEquals("023", initBuf("0123").deleteCharAt(1).toString)
     assertEquals("123", initBuf("0123").deleteCharAt(0).toString)
     assertEquals("012", initBuf("0123").deleteCharAt(3).toString)
@@ -83,7 +77,7 @@ class StringBufferTest {
                  initBuf("0123").deleteCharAt(4))
   }
 
-  @Test def replace(): Unit = {
+  test("replace") {
     assertEquals("0bc3", initBuf("0123").replace(1, 3, "bc").toString)
     assertEquals("abcd", initBuf("0123").replace(0, 4, "abcd").toString)
     assertEquals("abcd", initBuf("0123").replace(0, 10, "abcd").toString)
@@ -96,7 +90,7 @@ class StringBufferTest {
                  initBuf("0123").replace(-1, 3, "x"))
   }
 
-  @Test def setCharAt(): Unit = {
+  test("setCharAt") {
     val buf = newBuf
     buf.append("foobar")
 
@@ -112,12 +106,12 @@ class StringBufferTest {
                  buf.setCharAt(6, 'h'))
   }
 
-  @Test def ensureCapacity(): Unit = {
+  test("ensureCapacity") {
     // test that ensureCapacity is linking
     newBuf.ensureCapacity(10)
   }
 
-  @Test def shouldProperlySetLength(): Unit = {
+  test("should_properly_setLength") {
     val buf = newBuf
     buf.append("foobar")
 
@@ -127,7 +121,7 @@ class StringBufferTest {
     assertEquals("foo\u0000\u0000\u0000", { buf.setLength(6); buf.toString })
   }
 
-  @Test def appendCodePoint(): Unit = {
+  test("appendCodePoint") {
     val buf = newBuf
     buf.appendCodePoint(0x61)
     assertEquals("a", buf.toString)

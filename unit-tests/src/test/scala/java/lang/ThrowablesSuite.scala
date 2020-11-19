@@ -5,12 +5,7 @@ package java.lang
 //
 // The rest is an original contribution to Scala Native.
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class ThrowablesTest {
+object ThrowablesSuite extends tests.Suite {
 
   // Consolidate boilerplate; aids consistency.
 
@@ -26,26 +21,26 @@ class ThrowablesTest {
 
     val expectedMessage = getThrowableMessage(expectedCause)
 
-    assertTrue(s"cause: '${causeMessage}' != expected: '${expectedMessage}'",
-               resultCause == expectedCause)
+    assert(resultCause == expectedCause,
+           s"cause: '${causeMessage}' != expected: '${expectedMessage}'")
   }
 
   private def checkMessage(throwable: Throwable,
                            expectedMessage: String): Unit = {
     val resultMessage = throwable.getMessage
 
-    assertTrue(s"message: '${resultMessage}' != expected: '${expectedMessage}'",
-               resultMessage == expectedMessage)
+    assert(resultMessage == expectedMessage,
+           s"message: '${resultMessage}' != expected: '${expectedMessage}'")
   }
 
   private def checkStackTraceString(trace: String): Unit = {
     val startText = "java.lang.Throwable"
-    assertTrue(s"Expected trace to start with '${startText}' and it did not.",
-               trace.startsWith(startText))
+    assert(trace.startsWith(startText),
+           s"Expected trace to start with '${startText}' and it did not.")
 
     val containsText = "\tat <none>.main(Unknown Source)"
-    assertTrue(s"Expected trace to contain '${containsText}' and it did not.",
-               trace.contains(containsText))
+    assert(trace.contains(containsText),
+           s"Expected trace to contain '${containsText}' and it did not.")
   }
 
   private def checkStackTrace(throwable: Throwable): Unit = {
@@ -59,9 +54,9 @@ class ThrowablesTest {
 
   private def checkSuppressed(throwable: Throwable, expectedLength: Int) {
     val getSuppressedLength = throwable.getSuppressed.length
-    assertTrue(s"getSuppressed.length: ${getSuppressedLength} != " +
-                 s"expected: ${expectedLength}",
-               getSuppressedLength == expectedLength)
+    assert(getSuppressedLength == expectedLength,
+           s"getSuppressed.length: ${getSuppressedLength} != " +
+             s"expected: ${expectedLength}")
   }
 
   private def checkConstructed(throwable: Throwable,
@@ -77,7 +72,7 @@ class ThrowablesTest {
   // Zero & two argument constructor tests will exercise cases where
   // the rightmost two arguments are true.
 
-  @Test def throwableMessageCauseFalseFalse(): Unit = {
+  test("Throwable(message, cause, false, false)") {
     val expectedMessage = "Athchomar chomakea"
     val expectedCause   = new Throwable("Khal Drogo")
 
@@ -86,7 +81,7 @@ class ThrowablesTest {
     checkConstructed(throwable, expectedMessage, expectedCause, 0)
   }
 
-  @Test def throwableMessage(): Unit = {
+  test("Throwable(message)") {
     val expectedMessage = "Hello World"
     val expectedCause   = null
 
@@ -95,7 +90,7 @@ class ThrowablesTest {
     checkConstructed(throwable, expectedMessage, expectedCause, 0)
   }
 
-  @Test def throwableCause(): Unit = {
+  test("Throwable(cause)") {
     val expectedMessageStem = "Primum Mobile"
     val expectedMessage     = s"java.lang.Throwable: ${expectedMessageStem}"
 
@@ -106,7 +101,7 @@ class ThrowablesTest {
     checkConstructed(throwable, expectedMessage, expectedCause, 0)
   }
 
-  @Test def throwable(): Unit = {
+  test("Throwable()") {
     val expectedMessage = null
     val expectedCause   = null
 
@@ -134,23 +129,23 @@ class ThrowablesTest {
   //
   // This accounts for all thirteen methods.
 
-  @Test def addSuppressedExceptionInvalidArguments(): Unit = {
-    assertThrows(classOf[java.lang.NullPointerException], {
+  test("addSuppressed(exception) - invalid arguments") {
+    assertThrows[java.lang.NullPointerException] {
       val throwable = new Throwable()
       throwable.addSuppressed(null)
-    })
+    }
 
-    assertThrows(classOf[java.lang.IllegalArgumentException], {
+    assertThrows[java.lang.IllegalArgumentException] {
       val throwable = new Throwable("Expect IllegalArgumentException")
       throwable.addSuppressed(throwable)
-    })
+    }
   }
 
-  @Test def addSuppressedExceptionEnabledEqualsTrue(): Unit = {
+  test("addSuppressed(exception) - enabled == true") {
     val throwable = new Throwable()
 
     val sl = throwable.getSuppressed().length
-    assertTrue(s"length: ${sl} != expected: 0", sl == 0)
+    assert(sl == 0, s"length: ${sl} != expected: 0")
 
     val suppressed1 = new IllegalArgumentException("suppressed_1")
     val suppressed2 = new UnsupportedOperationException("suppressed_2")
@@ -159,56 +154,58 @@ class ThrowablesTest {
     // sets.
 
     throwable.addSuppressed(suppressed1)
-    assertTrue(s"first suppressed set did not match expected",
-               throwable.getSuppressed().toSet == Set(suppressed1))
+    assert(throwable.getSuppressed().toSet == Set(suppressed1),
+           s"first suppressed set did not match expected")
 
     throwable.addSuppressed(suppressed2)
-    assertTrue(s"second suppressed set did not match expected",
-               throwable.getSuppressed().toSet == Set(suppressed1, suppressed2))
+    assert(throwable.getSuppressed().toSet == Set(suppressed1, suppressed2),
+           s"second suppressed set did not match expected")
   }
 
-  @Test def addSuppressedExceptionEnabledEqualsFalse(): Unit = {
+  test("addSuppressed(exception) - enabled == false") {
     val throwable = new Throwable(null, null, false, true)
 
     val sl0 = throwable.getSuppressed().length
-    assertTrue(s"starting  suppressed length: ${sl0} != expected: 0", sl0 == 0)
+    assert(sl0 == 0, s"starting  suppressed length: ${sl0} != expected: 0")
 
     val suppressed1 = new IllegalArgumentException("suppressed_1")
     val suppressed2 = new UnsupportedOperationException("suppressed_2")
 
     throwable.addSuppressed(suppressed1)
     val sl1 = throwable.getSuppressed().length
-    assertTrue(s"first suppressed length: ${sl1} != expected: 0", sl1 == 0)
+    assert(sl1 == 0, s"first suppressed length: ${sl1} != expected: 0")
 
     throwable.addSuppressed(suppressed2)
     val sl2 = throwable.getSuppressed().length
-    assertTrue(s"second suppressed length: ${sl2} != expected: 0", sl2 == 0)
+    assert(sl2 == 0, s"second suppressed length: ${sl2} != expected: 0")
   }
 
-  @Test def initCauseCauseCasesWhichThrowAnException(): Unit = {
-    assertThrows(classOf[java.lang.IllegalArgumentException], {
+  test("initCause(cause) - cases which throw an Exception") {
+    assertThrows[java.lang.IllegalArgumentException] {
       val throwable = new Throwable()
       throwable.initCause(throwable)
-    })
+    }
 
-    assertThrows(classOf[java.lang.IllegalStateException], {
+    assertThrows[java.lang.IllegalStateException] {
       val throwable = new Throwable(new Throwable("Lyta-Zod"))
       throwable.initCause(new Throwable("Jayna-Zod"))
-    })
+    }
 
     locally {
       val throwable = new Throwable()
       throwable.initCause(new Throwable("Kem"))
 
-      assertThrows(classOf[java.lang.IllegalStateException],
-                   throwable.initCause(new Throwable("Cor-Vex")))
+      assertThrows[java.lang.IllegalStateException] {
+        throwable.initCause(new Throwable("Cor-Vex"))
+      }
 
-      assertThrows(classOf[java.lang.IllegalStateException],
-                   throwable.initCause(new Throwable("Jor-El")))
+      assertThrows[java.lang.IllegalStateException] {
+        throwable.initCause(new Throwable("Jor-El"))
+      }
     }
   }
 
-  @Test def initCauseCause(): Unit = {
+  test("initCause(cause)") {
     val throwable = new Throwable()
     // Constructor test above has already verified that initial cause is null.
 
@@ -221,11 +218,11 @@ class ThrowablesTest {
 
     val resultMsg = if (result == null) "null" else result.getMessage
 
-    assertTrue(s"unexpected cause: '${resultMsg}' != expected: '${causeMsg}'",
-               result == cause)
+    assert(result == cause,
+           s"unexpected cause: '${resultMsg}' != expected: '${causeMsg}'")
   }
 
-  @Test def printStackTracePrintStream(): Unit = {
+  test("printStackTrace(PrintStream)") {
     val throwable = new Throwable("Dev-Em")
     val baos      = new java.io.ByteArrayOutputStream
     val ps        = new java.io.PrintStream(baos)
@@ -236,28 +233,26 @@ class ThrowablesTest {
     checkStackTraceString(baos.toString(encoding))
   }
 
-  @Test def setStackTraceStackTraceInvalidArguments(): Unit = {
-    assertThrows(classOf[java.lang.NullPointerException], {
+  test("setStackTrace(stackTrace) - invalid arguments") {
+    assertThrows[java.lang.NullPointerException] {
       val throwable = new Throwable()
       throwable.setStackTrace(null)
-    })
+    }
 
-    assertThrows(
-      classOf[java.lang.NullPointerException], {
-        val throwable = new Throwable()
-        val newStackTrace = Array(
-          new StackTraceElement("Zero", "noMethod", "noFile", 0),
-          new StackTraceElement("One", "noMethod", "noFile", 1),
-          null.asInstanceOf[StackTraceElement],
-          new StackTraceElement("Three", "noMethod", "noFile", 3)
-        )
+    assertThrows[java.lang.NullPointerException] {
+      val throwable = new Throwable()
+      val newStackTrace = Array(
+        new StackTraceElement("Zero", "noMethod", "noFile", 0),
+        new StackTraceElement("One", "noMethod", "noFile", 1),
+        null.asInstanceOf[StackTraceElement],
+        new StackTraceElement("Three", "noMethod", "noFile", 3)
+      )
 
-        throwable.setStackTrace(newStackTrace)
-      }
-    )
+      throwable.setStackTrace(newStackTrace)
+    }
   }
 
-  @Test def setStackTraceStackTraceWritableTrue(): Unit = {
+  test("setStackTrace(stackTrace) - writable == true") {
     val throwable = new Throwable(null, null, true, true)
 
     val newStackTrace = Array(
@@ -273,14 +268,14 @@ class ThrowablesTest {
 
     val afterStackTrace = throwable.getStackTrace()
 
-    assertFalse(s"elements after setStackTrace() did not change",
-                afterStackTrace.sameElements(beforeStackTrace))
+    assert(!afterStackTrace.sameElements(beforeStackTrace),
+           s"elements after setStackTrace() did not change")
 
-    assertTrue(s"elements after setsetStackTrace() are not as expected",
-               afterStackTrace.sameElements(newStackTrace))
+    assert(afterStackTrace.sameElements(newStackTrace),
+           s"elements after setsetStackTrace() are not as expected")
   }
 
-  @Test def setStackTraceStackTraceWritableFalse(): Unit = {
+  test("setStackTrace(stackTrace) - writable == false") {
     val throwable = new Throwable(null, null, true, false)
 
     val newStackTrace = Array(
@@ -296,11 +291,11 @@ class ThrowablesTest {
 
     val afterStackTrace = throwable.getStackTrace()
 
-    assertTrue(s"stackTrace elements of non-writable stack differ",
-               afterStackTrace.sameElements(beforeStackTrace))
+    assert(afterStackTrace.sameElements(beforeStackTrace),
+           s"stackTrace elements of non-writable stack differ")
   }
 
-  @Test def setStackTraceStackTraceWriteToReturnedStack(): Unit = {
+  test("setStackTrace(stackTrace) - write to returned stack") {
     val throwable = new Throwable()
     val trace1    = throwable.getStackTrace()
 
@@ -309,15 +304,14 @@ class ThrowablesTest {
 
     val trace2 = throwable.getStackTrace()
 
-    assertTrue(
-      s"writing into returned trace should not affect next getStackTrace",
-      trace2(0) == savedElement0)
+    assert(trace2(0) == savedElement0,
+           s"writing into returned trace should not affect next getStackTrace")
 
-    assertTrue(s"second getStackTrace() should not change first result",
-               trace1(0) == null)
+    assert(trace1(0) == null,
+           s"second getStackTrace() should not change first result")
   }
 
-  @Test def testToString(): Unit = {
+  test("toString()") {
     val expectedClassName = "java.lang.Throwable"
 
     locally {
@@ -325,8 +319,7 @@ class ThrowablesTest {
 
       val expected = expectedClassName
       val result   = throwable.toString
-      assertTrue(s"result: ${result} != expected: ${expected}",
-                 result == expected)
+      assert(result == expected, s"result: ${result} != expected: ${expected}")
     }
 
     locally {
@@ -335,8 +328,7 @@ class ThrowablesTest {
 
       val expected = s"${expectedClassName}: ${message}"
       val result   = throwable.toString
-      assertTrue(s"result: ${result} != expected: ${expected}",
-                 result == expected)
+      assert(result == expected, s"result: ${result} != expected: ${expected}")
     }
   }
 }

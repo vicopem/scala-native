@@ -2,244 +2,236 @@ package java.lang
 
 import java.lang.Float.{floatToIntBits, floatToRawIntBits, intBitsToFloat}
 
-import org.junit.Test
-import org.junit.Assert._
-
-import scalanative.junit.utils.AssertThrows._
-
-class FloatTest {
-  @Test def testEquals(): Unit = {
+object FloatSuite extends tests.Suite {
+  test("equals") {
     val pzero = +0.0f
     val nzero = -0.0f
-    assertTrue(pzero equals pzero)
-    assertTrue(nzero equals nzero)
-    assertFalse(pzero equals nzero)
+    assert(pzero equals pzero)
+    assert(nzero equals nzero)
+    assertNot(pzero equals nzero)
     val szero = 1.0f - 1.0f
-    assertTrue(pzero equals szero)
+    assert(pzero equals szero)
 
     val bpzero: java.lang.Float = pzero
     val bnzero: java.lang.Float = nzero
-    assertFalse(bpzero equals bnzero)
+    assertNot(bpzero equals bnzero)
     val bszero: java.lang.Float = szero
-    assertTrue(bpzero equals bszero)
+    assert(bpzero equals bszero)
 
     val num1 = 123.45f
     val num2 = 123.45f
-    assertTrue(num1 equals num2)
+    assert(num1 equals num2)
 
     val bnum1: java.lang.Float = num1
     val bnum2: java.lang.Float = num2
-    assertTrue(bnum1 == bnum2)
+    assert(bnum1 == bnum2)
     val pmax1 = scala.Float.MaxValue
     val pmax2 = scala.Float.MaxValue
-    assertTrue(pmax1 equals pmax2)
+    assert(pmax1 equals pmax2)
     val pmax3 = scala.Float.MaxValue + 1
-    assertTrue(pmax1 equals pmax3)
+    assert(pmax1 equals pmax3)
 
     val bpmax1: java.lang.Float = scala.Float.MaxValue
     val bpmax2: java.lang.Float = scala.Float.MaxValue
-    assertTrue(bpmax1 equals bpmax2)
+    assert(bpmax1 equals bpmax2)
     val bpmax3: java.lang.Float = scala.Float.MaxValue + 1
-    assertTrue(bpmax1 equals bpmax3)
+    assert(bpmax1 equals bpmax3)
 
     val pmin1 = scala.Float.MinValue
     val pmin2 = scala.Float.MinValue
-    assertTrue(pmin1 equals pmin2)
+    assert(pmin1 equals pmin2)
     val pmin3 = scala.Float.MinValue + 1
-    assertTrue(pmin1 equals pmin3)
+    assert(pmin1 equals pmin3)
 
     val bpmin1: java.lang.Float = scala.Float.MinValue
     val bpmin2: java.lang.Float = scala.Float.MinValue
-    assertTrue(bpmin1 equals bpmin2)
+    assert(bpmin1 equals bpmin2)
     val bpmin3: java.lang.Float = scala.Float.MinValue + 1
-    assertTrue(bpmin1 equals bpmin3)
+    assert(bpmin1 equals bpmin3)
 
     val pinf1 = scala.Float.PositiveInfinity
     val pinf2 = scala.Float.MaxValue + scala.Float.MaxValue
-    assertTrue(pinf1 equals pinf2)
+    assert(pinf1 equals pinf2)
 
     val bpinf1: java.lang.Float = pinf1
     val bpinf2: java.lang.Float = pinf2
-    assertTrue(bpinf1 equals bpinf2)
+    assert(bpinf1 equals bpinf2)
 
     val ninf1 = scala.Float.NegativeInfinity
     val ninf2 = scala.Float.MinValue + scala.Float.MinValue
-    assertTrue(ninf1 equals ninf2)
+    assert(ninf1 equals ninf2)
 
     val bninf1: java.lang.Float = ninf1
     val bninf2: java.lang.Float = ninf2
-    assertTrue(bninf1 equals bninf2)
+    assert(bninf1 equals bninf2)
 
-    assertTrue(Float.NaN equals Float.NaN)
+    assert(Float.NaN equals Float.NaN)
 
     val x = Float.NaN
     val y = intBitsToFloat(floatToRawIntBits(x) | 1)
-    assertTrue(x equals y)
+    assert(x equals y)
 
     val z = intBitsToFloat(floatToIntBits(x) | 1)
-    assertTrue(x equals z)
+    assert(x equals z)
   }
 
-  @Test def testEqualEqual(): Unit = {
+  test("==") {
     val pzero = +0.0f
     val nzero = -0.0f
-    assertTrue(pzero == pzero)
-    assertTrue(nzero == nzero)
-    assertTrue(pzero == nzero)
+    assert(pzero == pzero)
+    assert(nzero == nzero)
+    assert(pzero == nzero)
     val szero = 1.0f - 1.0f
-    assertTrue(pzero == szero)
+    assert(pzero == szero)
 
     val bpzero: Any = pzero
     val bnzero: Any = nzero
-    assertTrue(bpzero == bnzero)
+    assert(bpzero == bnzero)
     val bszero: java.lang.Float = szero
-    assertTrue(bpzero == bszero)
+    assert(bpzero == bszero)
 
     val num1 = 123.45f
     val num2 = 123.45f
-    assertTrue(num1 == num2)
+    assert(num1 == num2)
 
     val bnum1: java.lang.Float = num1
     val bnum2: java.lang.Float = num2
-    assertTrue(bnum1 == bnum2)
+    assert(bnum1 == bnum2)
 
     val pmax1 = scala.Float.MaxValue
     val pmax2 = scala.Float.MaxValue
-    assertTrue(pmax1 == pmax2)
+    assert(pmax1 == pmax2)
     val pmax3 = scala.Float.MaxValue + 1
-    assertTrue(pmax1 == pmax3)
+    assert(pmax1 == pmax3)
 
     val bpmax1: java.lang.Float = scala.Float.MaxValue
     val bpmax2: java.lang.Float = scala.Float.MaxValue
-    assertTrue(bpmax1 == bpmax2)
+    assert(bpmax1 == bpmax2)
     val bpmax3: java.lang.Float = scala.Float.MaxValue + 1
-    assertTrue(bpmax1 == bpmax3)
+    assert(bpmax1 == bpmax3)
 
     val pmin1 = scala.Float.MinValue
     val pmin2 = scala.Float.MinValue
-    assertTrue(pmin1 == pmin2)
+    assert(pmin1 == pmin2)
     val pmin3 = scala.Float.MinValue + 1
-    assertTrue(pmin1 == pmin3)
+    assert(pmin1 == pmin3)
 
     val bpmin1: java.lang.Float = scala.Float.MinValue
     val bpmin2: java.lang.Float = scala.Float.MinValue
-    assertTrue(bpmin1 == bpmin2)
+    assert(bpmin1 == bpmin2)
     val bpmin3: java.lang.Float = scala.Float.MinValue + 1
-    assertTrue(bpmin1 == bpmin3)
+    assert(bpmin1 == bpmin3)
 
     val pinf1 = scala.Float.PositiveInfinity
     val pinf2 = scala.Float.MaxValue + scala.Float.MaxValue
-    assertTrue(pinf1 == pinf2)
+    assert(pinf1 == pinf2)
 
     val bpinf1: java.lang.Float = pinf1
     val bpinf2: java.lang.Float = pinf2
-    assertTrue(bpinf1 == bpinf2)
+    assert(bpinf1 == bpinf2)
 
     val ninf1 = scala.Float.NegativeInfinity
     val ninf2 = scala.Float.MinValue + scala.Float.MinValue
-    assertTrue(ninf1 == ninf2)
+    assert(ninf1 == ninf2)
 
     val bninf1: java.lang.Float = ninf1
     val bninf2: java.lang.Float = ninf2
-    assertTrue(bninf1 == bninf2)
+    assert(bninf1 == bninf2)
 
-    assertFalse(Float.NaN == Float.NaN)
+    assertNot(Float.NaN == Float.NaN)
 
     val x = Float.NaN
     val y = intBitsToFloat(floatToRawIntBits(x) | 1)
-    assertFalse(x == y)
+    assertNot(x == y)
 
     val z = intBitsToFloat(floatToIntBits(x) | 1)
-    assertFalse(x == z)
+    assertNot(x == z)
   }
 
-  @Test def testEq(): Unit = {
+  test("eq") {
     val bpzero: java.lang.Float = +0.0f
     val bnzero: java.lang.Float = -0.0f
-    assertTrue(bpzero eq bpzero)
-    assertTrue(bnzero eq bnzero)
-    assertFalse(bpzero eq bnzero)
+    assert(bpzero eq bpzero)
+    assert(bnzero eq bnzero)
+    assertNot(bpzero eq bnzero)
     val bszero: java.lang.Float = 1.0f - 1.0f
-    assertFalse(bpzero eq bszero)
+    assertNot(bpzero eq bszero)
 
     val bnum1: java.lang.Float = 123.45f
     val bnum2: java.lang.Float = 123.45f
-    assertFalse(bnum1 eq bnum2)
+    assertNot(bnum1 eq bnum2)
 
     val bpmax1: java.lang.Float = scala.Float.MaxValue
     val bpmax2: java.lang.Float = scala.Float.MaxValue
-    assertFalse(bpmax1 eq bpmax2)
+    assertNot(bpmax1 eq bpmax2)
     val bpmax3: java.lang.Float = scala.Float.MaxValue + 1
-    assertFalse(bpmax1 eq bpmax3)
+    assertNot(bpmax1 eq bpmax3)
 
     val bpmin1: java.lang.Float = scala.Float.MinValue
     val bpmin2: java.lang.Float = scala.Float.MinValue
-    assertFalse(bpmin1 eq bpmin2)
+    assertNot(bpmin1 eq bpmin2)
     val bpmin3: java.lang.Float = scala.Float.MinValue + 1
-    assertFalse(bpmin1 eq bpmin3)
+    assertNot(bpmin1 eq bpmin3)
 
     val bpinf1: java.lang.Float = scala.Float.PositiveInfinity
     val bpinf2: java.lang.Float = scala.Float.MaxValue + scala.Float.MaxValue
-    assertFalse(bpinf1 eq bpinf2)
+    assertNot(bpinf1 eq bpinf2)
 
     val bninf1: java.lang.Float = scala.Float.NegativeInfinity
     val bninf2: java.lang.Float = scala.Float.MinValue + scala.Float.MinValue
-    assertFalse(bninf1 eq bninf2)
+    assertNot(bninf1 eq bninf2)
   }
 
-  @Test def parseFloat(): Unit = {
-    assertTrue(Float.parseFloat("1.0") == 1.0f)
-    assertTrue(Float.parseFloat("-1.0") == -1.0f)
-    assertTrue(Float.parseFloat("0.0") == 0.0f)
-    assertTrue(Float.parseFloat("-0.0") == -0.0f)
-    assertTrue(Float.parseFloat("Infinity") == Float.POSITIVE_INFINITY)
-    assertTrue(Float.parseFloat("-Infinity") == Float.NEGATIVE_INFINITY)
-    assertTrue(Float.isNaN(Float.parseFloat("NaN")))
+  test("parseFloat") {
+    assert(Float.parseFloat("1.0") == 1.0f)
+    assert(Float.parseFloat("-1.0") == -1.0f)
+    assert(Float.parseFloat("0.0") == 0.0f)
+    assert(Float.parseFloat("-0.0") == -0.0f)
+    assert(Float.parseFloat("Infinity") == Float.POSITIVE_INFINITY)
+    assert(Float.parseFloat("-Infinity") == Float.NEGATIVE_INFINITY)
+    assert(Float.isNaN(Float.parseFloat("NaN")))
 
-    assertTrue("a8", Float.parseFloat("6.66D") == 6.66f)
+    assert(Float.parseFloat("6.66D") == 6.66f, "a8")
 
     // Java allows trailing whitespace, including tabs & nulls.
-    assertTrue("a9", Float.parseFloat("6.66D\t ") == 6.66f)
-    assertTrue("a9a", Float.parseFloat("6.66D\u0000") == 6.66f)
+    assert(Float.parseFloat("6.66D\t ") == 6.66f, "a9")
+    assert(Float.parseFloat("6.66D\u0000") == 6.66f, "a9a")
 
-    assertTrue("a10", Float.parseFloat("6.66d") == 6.66f)
+    assert(Float.parseFloat("6.66d") == 6.66f, "a10")
 
-    assertTrue("a11", Float.parseFloat("7.77F") == 7.77f)
-    assertTrue("a12", Float.parseFloat("7.77f") == 7.77f)
+    assert(Float.parseFloat("7.77F") == 7.77f, "a11")
+    assert(Float.parseFloat("7.77f") == 7.77f, "a12")
 
     // Does not parse characters beyond IEEE754 spec.
-    assertTrue(
-      "a13",
-      Float.parseFloat("1.7976931348623157999999999") == 1.7976931348623157f)
+    assert(
+      Float.parseFloat("1.7976931348623157999999999") == 1.7976931348623157f,
+      "a13")
 
-    assertThrows(classOf[NumberFormatException], Float.parseFloat(""))
-    assertThrows(classOf[NumberFormatException], Float.parseFloat("F"))
-    assertThrows(classOf[NumberFormatException], Float.parseFloat("potato"))
-    assertThrows(classOf[NumberFormatException], Float.parseFloat("0.0potato"))
-    assertThrows(classOf[NumberFormatException], Float.parseFloat("0.potato"))
+    assertThrows[NumberFormatException](Float.parseFloat(""))
+    assertThrows[NumberFormatException](Float.parseFloat("F"))
+    assertThrows[NumberFormatException](Float.parseFloat("potato"))
+    assertThrows[NumberFormatException](Float.parseFloat("0.0potato"))
+    assertThrows[NumberFormatException](Float.parseFloat("0.potato"))
 
-    assertThrows(classOf[NumberFormatException], Float.parseFloat("6.66 F"))
-    assertThrows(classOf[NumberFormatException],
-                 Float.parseFloat("6.66F  Bad  "))
-    assertThrows(classOf[NumberFormatException],
-                 Float.parseFloat("6.66F\u0000a"))
-    assertThrows(classOf[NumberFormatException],
-                 Float.parseFloat("6.66F \u0100"))
+    assertThrows[NumberFormatException](Float.parseFloat("6.66 F"))
+    assertThrows[NumberFormatException](Float.parseFloat("6.66F  Bad  "))
+    assertThrows[NumberFormatException](Float.parseFloat("6.66F\u0000a"))
+    assertThrows[NumberFormatException](Float.parseFloat("6.66F \u0100"))
 
     // Out of IEE754 range handling
 
     //   Too big - java.lang.Float.MAX_VALUE times 10
-    assertTrue("a20",
-               Float.parseFloat("3.4028235E39") ==
-                 Float.POSITIVE_INFINITY)
+    assert(Float.parseFloat("3.4028235E39") ==
+             Float.POSITIVE_INFINITY,
+           "a20")
 
     //   Too big - Negative java.lang.Float.MAX_VALUE times 10
-    assertTrue("a21",
-               Float.parseFloat("-3.4028235E39") ==
-                 Float.NEGATIVE_INFINITY)
+    assert(Float.parseFloat("-3.4028235E39") ==
+             Float.NEGATIVE_INFINITY,
+           "a21")
 
     //   Too close to 0 - java.lang.Float.MIN_VALUE divided by 10
-    assertTrue("a22", Float.parseFloat("1.4E-46") == 0.0f)
+    assert(Float.parseFloat("1.4E-46") == 0.0f, "a22")
 
     // Scala Native Issue #1836, a string Too Big reported from the wild.
     val a = "274672389457236457826542634627345697228374687236476867674746" +
@@ -248,24 +240,24 @@ class FloatTest {
       "7384567845678658734587364576745683475674576345786348576847567846578" +
       "3456702897830296720476846578634576384567845678346573465786457863"
 
-    assertTrue("a23", Float.parseFloat(a) == Float.POSITIVE_INFINITY)
+    assert(Float.parseFloat(a) == Float.POSITIVE_INFINITY, "a23")
 
     // Hexadecimal strings
-    assertTrue("a30", Float.parseFloat("0x0p1") == 0.0f)
-    assertTrue("a31", Float.parseFloat("0x1p0") == 1.0f)
-    assertTrue("a32", Float.parseFloat("0x1p1D") == 2.0f)
+    assert(Float.parseFloat("0x0p1") == 0.0f, "a30")
+    assert(Float.parseFloat("0x1p0") == 1.0f, "a31")
+    assert(Float.parseFloat("0x1p1D") == 2.0f, "a32")
 
-    assertTrue("a33", Float.parseFloat("0x1.8eae14p6") == 99.67f)
-    assertTrue("a34", Float.parseFloat("-0x1.8eae14p6") == -99.67f)
+    assert(Float.parseFloat("0x1.8eae14p6") == 99.67f, "a33")
+    assert(Float.parseFloat("-0x1.8eae14p6") == -99.67f, "a34")
   }
 
   // scala.Float passes -0.0F without change. j.l.Double forced to +0.0.
   private def assertF2sEquals(expected: String, f: scala.Float): Unit = {
     val result = f.toString
-    assertTrue(s"result: $result != expected: $expected", expected == result)
+    assert(expected == result, s"result: $result != expected: $expected")
   }
 
-  @Test def testToString(): Unit = {
+  test("toString") {
 
     // Test non-finite values.
     assertF2sEquals("Infinity", Float.POSITIVE_INFINITY)
