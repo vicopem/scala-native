@@ -573,6 +573,10 @@ lazy val tests =
     )
     .settings(noPublishSettings)
     .settings(
+      testFrameworks ++= Seq(
+        new TestFramework("tests.NativeFramework"),
+        new TestFramework("com.novocode.junit.JUnitFramework")
+      ),
       Test / testOptions ++= Seq(
         Tests.Argument(TestFrameworks.JUnit, "-a", "-s", "-v")
       ),
