@@ -61,7 +61,7 @@ class BufferedInputStream(_in: InputStream, size: Int)
     ensureOpen()
 
     if (prepareRead()) {
-      val res = buf(pos).toInt & 0xff
+      val res = buf(pos).toInt
       pos += 1
       res
     } else -1
