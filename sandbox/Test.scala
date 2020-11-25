@@ -6,7 +6,7 @@ object Test {
     val diff = 1000
     for(i <- 0 until 100000) {
       val strings = for(j <- 0 until diff) yield (i*diff+j).toBinaryString
-      //strings.foreach(println)
+      strings.foreach(println)
     }
   }
 }

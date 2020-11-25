@@ -58,8 +58,7 @@ static inline void ObjectMeta_SweepLineAt(ObjectMeta *start) {
     //    implements this, just with hardcoded constants:
     //
     size_t startIndex = 0;
-    size_t endIndex = startIndex + WORDS_IN_LINE /
-    ALLOCATION_ALIGNMENT_WORDS;
+    size_t endIndex = startIndex + WORDS_IN_LINE / ALLOCATION_ALIGNMENT_WORDS;
     ObjectMeta *data = start;
     
     for (size_t i = startIndex; i < endIndex; i++) {

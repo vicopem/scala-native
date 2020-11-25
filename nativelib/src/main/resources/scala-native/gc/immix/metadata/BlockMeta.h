@@ -57,7 +57,7 @@ static inline void BlockMeta_SetSuperblockSize(BlockMeta *blockMeta,
                                                int32_t superblockSize) {
     assert(!BlockMeta_IsSuperblockStart(blockMeta) || superblockSize > 0);
     assert(!BlockMeta_IsSimpleBlock(blockMeta));
-
+    // TODO: Isn't Superblock Middle a simple block ?
     blockMeta->block.superblock.size = superblockSize;
 }
 

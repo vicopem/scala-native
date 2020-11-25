@@ -2,7 +2,7 @@
 #define IMMIX_CONSTANTS_H
 
 #define P_32_BITS 1
-// TODO: 32-bits addon
+// TODO: 32-bits addon. Can't replace WORD_SIZE by sizeof(word_t) ?
 #ifdef P_32_BITS
 #define WORD_SIZE_BITS 2
 #else
@@ -16,11 +16,7 @@
 
 // TODO: 32-bits
 #define BLOCK_SIZE_BITS 15
-#ifdef P_32_BITS
 #define LINE_SIZE_BITS 8    // Hardcoded way down deep. Will try keeping it.
-#else
-#define LINE_SIZE_BITS 8
-#endif
 #define BLOCK_COUNT_BITS 24
 
 #define LINE_METADATA_SIZE_BITS 0
