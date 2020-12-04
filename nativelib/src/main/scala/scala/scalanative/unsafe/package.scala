@@ -10,10 +10,10 @@ import scalanative.runtime.Intrinsics.{castIntToRawPtr, castLongToRawPtr}
 package object unsafe {
 
   /** Int on 32-bit architectures and Long on 64-bit ones. */
-  type Word = Long  // TODO: What about 32-bits
+  type Word = Int  // TODO: What about 32-bits
 
   /** UInt on 32-bit architectures and ULong on 64-bit ones. */
-  type UWord = ULong  // TODO: What about 32-bits
+  type UWord = UInt  // TODO: What about 32-bits
 
   /** The C 'char' type. */
   type CChar = Byte
@@ -79,7 +79,7 @@ package object unsafe {
   type CSSize = Word
 
   /** The C/C++ 'ptrdiff_t' type. */
-  type CPtrDiff = Long
+  type CPtrDiff = Word//Long TODO: 32-bits change
 
   /** C-style string with trailing 0. */
   type CString = Ptr[CChar]

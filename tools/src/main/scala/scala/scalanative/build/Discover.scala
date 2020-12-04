@@ -50,7 +50,7 @@ object Discover {
           .getOrElse(Seq.empty)
       ("/usr/local/include" +: includedir).map(s => s"-I$s")
     }
-    includes :+ "-Qunused-arguments" :+ "-g" :+ m32 :+ "-rtlib=compiler-rt" :+ "-O0"  /*:+ "-fsanitize=address"*/ :+ "-fsanitize=undefined"
+    includes :+ "-Qunused-arguments" :+ "-g" :+ m32 :+ "-rtlib=compiler-rt" :+ "-O0"  /*:+ "-fsanitize=address"*/ :+ "-fsanitize=undefined" :+ "-DDEBUG"
   }
 
   /** Find default options passed to the system's native linker. */
@@ -87,8 +87,10 @@ object Discover {
       val linesIter = Files.readAllLines(targetll).iterator()
       while (linesIter.hasNext()) {
         val line = linesIter.next()
-        if (line.startsWith("target triple"))
+        if (line.startsWith("target triple")) {
+          return "i386-pc-linux-gnu"// TODO: Adapt this.
           return line.split("\"").apply(1)
+        }
       }
       fail
     }

@@ -55,10 +55,6 @@ word_t *Heap_mapAndAlign(size_t memoryLimit, size_t alignmentSize) {
                              HEAP_MEM_FD, HEAP_MEM_FD_OFFSET);
 
     size_t alignmentMask = ~(alignmentSize - 1);
-    if(memoryLimit >= sizeof(word_t)) {
-        printf("Block size : %u\nAlignment : %u\n\n", memoryLimit, alignmentSize);
-        *heapStart = 123456;    // To see if it conflicts
-    }
     // Heap start not aligned on
     if (((word_t)heapStart & alignmentMask) != (word_t)heapStart) {
         word_t *previousBlock = (word_t *)((word_t)heapStart & alignmentMask);

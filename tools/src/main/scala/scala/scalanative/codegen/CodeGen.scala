@@ -826,7 +826,7 @@ object CodeGen {
           genType(ty)
           str(", ")
           genVal(n)
-          str(", align 4")
+          //str(", align 8")
           // TODO: 32-bits comment. May need to be removed (LLVM infers alignment)
 
           newline()

@@ -46,7 +46,8 @@ final class Ptr[T] private[scalanative] (
   @alwaysinline def -(other: Ptr[T])(implicit tag: Tag[T]): CPtrDiff = {
     val left  = castRawPtrToLong(rawptr)
     val right = castRawPtrToLong(other.rawptr)
-    (left - right) / sizeof[T]
+    //TODO: 32-bits change. Make it nicer
+    (left - right).asInstanceOf[Word] / sizeof[T]
   }
 
   @alwaysinline def apply(offset: Word)(implicit tag: Tag[T]): T =

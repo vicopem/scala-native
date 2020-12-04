@@ -22,13 +22,14 @@ final case class MemoryLayout(size: Long,
 }
 
 object MemoryLayout {
-  final val WORD_SIZE = 8
+  final val WORD_SIZE = 4
+  final val BYTE_SIZE = 8
 
   final case class PositionedType(ty: Type, offset: Long)
 
   def sizeOf(ty: Type): Long = ty match {
     case primitive: Type.PrimitiveKind =>
-      math.max(primitive.width / WORD_SIZE, 1)
+      math.max(primitive.width / BYTE_SIZE, 1)
     case Type.ArrayValue(ty, n) =>
       sizeOf(ty) * n
     case Type.StructValue(tys) =>
@@ -41,7 +42,7 @@ object MemoryLayout {
 
   def alignmentOf(ty: Type): Long = ty match {
     case primitive: Type.PrimitiveKind =>
-      math.max(primitive.width / WORD_SIZE, 1)
+      math.max(primitive.width / BYTE_SIZE, 1)
     case Type.ArrayValue(ty, n) =>
       alignmentOf(ty)
     case Type.StructValue(Seq()) =>

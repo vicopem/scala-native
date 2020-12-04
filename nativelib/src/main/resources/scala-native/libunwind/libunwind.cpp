@@ -11,7 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "include-libunwind/libunwind.h"
-
+#undef NDEBUG
 #ifndef NDEBUG
 #include <cstdlib> // getenv
 #endif

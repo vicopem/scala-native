@@ -29,14 +29,14 @@ private[lang] object StackTrace {
    *  so we cache stack trace elements based on current instruction pointer.
    */
   private def cachedStackTraceElement(cursor: Ptr[scala.Byte],
-                                      ip: CUnsignedLong): StackTraceElement =
+                                      ip: UWord): StackTraceElement =
     cache.getOrElseUpdate(ip, makeStackTraceElement(cursor))
 
   @noinline private[lang] def currentStackTrace(): Array[StackTraceElement] = {
     val cursor  = stackalloc[scala.Byte](2048)
     val context = stackalloc[scala.Byte](2048)
     val offset  = stackalloc[scala.Byte](8)
-    val ip      = stackalloc[CUnsignedLongLong]
+    val ip      = stackalloc[UWord]
     var buffer  = mutable.ArrayBuffer.empty[StackTraceElement]
 
     unwind.get_context(context)
