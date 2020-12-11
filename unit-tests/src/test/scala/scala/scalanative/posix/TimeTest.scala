@@ -12,7 +12,7 @@ class TimeTest {
   tzset()
   //In 2.11/2.12 time was resolved to posix.time.type, in 2.13 to posix.time.time method
   val now_time_t: time_t = scala.scalanative.posix.time.time(null)
-  val epoch: time_t      = 0L
+  val epoch: time_t      = 0
 
   @Test def asctimeWithGivenKnownStateShouldMatchItsRepresentation(): Unit = {
     Zone { implicit z =>

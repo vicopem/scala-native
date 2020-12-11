@@ -7,15 +7,15 @@ import scala.scalanative.runtime.{ByteArray, zlib}
 // Ported from Apache Harmony
 
 class CRC32 extends Checksum {
-  private var crc: Long         = 0L
-  private[zip] var tbytes: Long = 0L
+  private var crc: CUnsignedLong = 0.toUInt
+  private[zip] var tbytes: Long = 0
 
   def getValue(): Long =
-    crc
+    crc.toLong
 
   def reset(): Unit = {
-    tbytes = 0L
-    crc = 0L
+    tbytes = 0
+    crc = 0.toUInt
   }
 
   def update(v: Int): Unit =
@@ -37,8 +37,7 @@ class CRC32 extends Checksum {
   private def updateImpl(buf: Array[Byte],
                          off: Int,
                          nbytes: Int,
-                         crc1: Long): Long =
+                         crc1: CUnsignedLong): CUnsignedLong =
     zlib
-      .crc32(crc1.toULong.asInstanceOf[CUnsignedLong], buf.asInstanceOf[ByteArray].at(off), nbytes.toUInt)
-      .toLong
+      .crc32(crc1, buf.asInstanceOf[ByteArray].at(off), nbytes.toUInt)
 }

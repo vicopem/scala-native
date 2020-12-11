@@ -7,13 +7,13 @@ import scala.scalanative.runtime.{ByteArray, zlib}
 // Ported from Apache Harmony
 
 class Adler32 extends Checksum {
-  private var adler: Long = 1L
+  private var adler: CUnsignedLong = 1.toUInt
 
   def getValue(): Long =
-    adler
+    adler.toLong
 
   def reset(): Unit =
-    adler = 1
+    adler = 1.toUInt
 
   def update(i: Int): Unit =
     update(Array(i.toByte))
@@ -33,10 +33,9 @@ class Adler32 extends Checksum {
   private def updateImpl(buf: Array[Byte],
                          off: Int,
                          nbytes: Int,
-                         adler1: Long): Long =
+                         adler1: CUnsignedLong): CUnsignedLong =
     zlib
-      .adler32(adler1.toULong.asInstanceOf[CUnsignedLong],
+      .adler32(adler1,
                buf.asInstanceOf[ByteArray].at(off),
                nbytes.toUInt)
-      .toLong
 }
