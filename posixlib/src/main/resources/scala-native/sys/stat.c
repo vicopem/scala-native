@@ -32,7 +32,7 @@ struct scalanative_stat {
     scalanative_nlink_t st_nlink; /** Number of hard links to the file. */
     scalanative_mode_t st_mode;   /** Mode of file (see below). */
 };
-
+#include <stdio.h>
 void scalanative_stat_init(struct stat *stat,
                            struct scalanative_stat *my_stat) {
     my_stat->st_dev = stat->st_dev;

@@ -180,7 +180,7 @@ class ZipFile(file: File, mode: Int, charset: Charset) extends Closeable {
     ler.readShortLE(bin)
 
     if (numEntries != totalNumEntries || diskNumber != 0 || diskWithCentralDir != 0) {
-      throw new ZipException("spanned archves not supported")
+      throw new ZipException("spanned archves not supported - Num entries : "+numEntries+", Total : "+totalNumEntries+", Disk Number : "+diskNumber+", Disk Central Dir : "+diskWithCentralDir)
     }
 
     /*

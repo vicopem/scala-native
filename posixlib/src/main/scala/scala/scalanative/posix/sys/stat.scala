@@ -8,14 +8,16 @@ import scalanative.posix.unistd.off_t
 
 @extern
 object stat {
-  type dev_t     = CUnsignedLong
-  type ino_t     = CUnsignedLongLong
+  // Each type has an equivalent in types.h
+  // If updating, need to be updated there too.
+  type dev_t     = CUnsignedLongLong
+  type ino_t     = CUnsignedLong
   type mode_t    = CUnsignedInt
   type nlink_t   = CUnsignedLong
   type uid_t     = CUnsignedInt
   type gid_t     = CUnsignedInt
   type blksize_t = CLong
-  type blkcnt_t  = CLongLong
+  type blkcnt_t  = CLong
   type stat = CStruct13[dev_t, // st_dev
                         dev_t,     // st_rdev
                         ino_t,     // st_ino

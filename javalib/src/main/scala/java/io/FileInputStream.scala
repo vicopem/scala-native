@@ -77,7 +77,7 @@ class FileInputStream(fd: FileDescriptor, file: Option[File])
       throw new IOException()
     } else {
       val bytesToSkip = Math.min(n, available())
-      lseek(fd.fd, bytesToSkip, SEEK_CUR)
+      lseek(fd.fd, bytesToSkip.asInstanceOf[off_t], SEEK_CUR)
       bytesToSkip
     }
 
