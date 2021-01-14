@@ -12,6 +12,8 @@ struct scalanative_tm {
     int tm_wday;
     int tm_yday;
     int tm_isdst;
+    long tm_gmtoff;
+    char* tm_zone;
 };
 
 static struct scalanative_tm scalanative_gmtime_buf;

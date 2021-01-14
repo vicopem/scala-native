@@ -46,10 +46,10 @@ package object unsafe {
   type CInt = Int
 
   /** The C 'long' type. */
-  type CLong = Word // TODO: Not Long ?
+  type CLong = Word
 
   /** The C 'long int' type. */
-  type CLongInt = Long
+  type CLongInt = Word
 
   /** The C 'long long' type. */
   type CLongLong = Long

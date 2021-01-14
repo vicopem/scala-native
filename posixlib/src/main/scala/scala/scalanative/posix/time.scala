@@ -10,7 +10,7 @@ object time {
   type time_t   = types.time_t
   type clock_t  = types.clock_t
   type timespec = CStruct2[time_t, CLong]
-  type tm       = CStruct9[CInt, CInt, CInt, CInt, CInt, CInt, CInt, CInt, CInt]
+  type tm       = CStruct11[CInt, CInt, CInt, CInt, CInt, CInt, CInt, CInt, CInt, CLong, CString]
 
   @name("scalanative_asctime")
   def asctime(time_ptr: Ptr[tm]): CString = extern

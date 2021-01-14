@@ -114,11 +114,11 @@ object UnixProcess {
   @extern
   private[this] object ProcessMonitor {
     @name("scalanative_process_monitor_check_result")
-    def checkResult(pid: Int): CInt = extern
+    def checkResult(pid: CInt): CInt = extern
     @name("scalanative_process_monitor_init")
     def init(): Unit = extern
     @name("scalanative_process_monitor_wait_for_pid")
-    def waitForPid(pid: Int, ts: Ptr[timespec], res: Ptr[CInt]): CInt = extern
+    def waitForPid(pid: CInt, ts: Ptr[timespec], res: Ptr[CInt]): CInt = extern
   }
   ProcessMonitor.init()
 
